@@ -8,7 +8,7 @@ import (
 
 	"github.com/aclgo/grpc-jwt/internal/session"
 	"github.com/alicebob/miniredis"
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/require"
 )
 

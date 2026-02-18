@@ -28,6 +28,8 @@ func (p *postgresRepo) Add(ctx context.Context, user *models.User) (*models.User
 		user.Email,
 		user.Role,
 		user.Verified,
+		user.CreatedAt,
+		user.UpdatedAt,
 	).StructScan(&createdUser)
 
 	if err != nil {
@@ -60,8 +62,9 @@ func (p *postgresRepo) Update(ctx context.Context, user *models.User) (*models.U
 		user.Lastname,
 		user.Password,
 		user.Email,
-		user.UpdatedAt,
+		user.Role,
 		user.Verified,
+		user.UpdatedAt,
 		user.UserID,
 	).StructScan(&updatedUser)
 

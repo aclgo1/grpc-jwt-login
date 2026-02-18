@@ -11,13 +11,9 @@ import (
 	"github.com/aclgo/grpc-jwt/internal/user"
 	"github.com/aclgo/grpc-jwt/internal/utils"
 	"github.com/aclgo/grpc-jwt/pkg/logger"
-	"github.com/go-redis/redis"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-)
-
-const (
-	ClientRole = "client"
+	"github.com/redis/go-redis/v9"
 )
 
 var (
@@ -32,16 +28,18 @@ type userUC struct {
 	userRepoDatabase user.UserRepoDatabase
 	userRepoCache    user.UserRepoCache
 	jwtSession       session.SessionUC
+	rc               *redis.Client
 }
 
 func NewUserUC(logger logger.Logger,
 	userRepoDatabase user.UserRepoDatabase,
-	userRepoCache user.UserRepoCache, sessionUC session.SessionUC) *userUC {
+	userRepoCache user.UserRepoCache, sessionUC session.SessionUC, rc *redis.Client) *userUC {
 	return &userUC{
 		logger:           logger,
 		userRepoDatabase: userRepoDatabase,
 		userRepoCache:    userRepoCache,
 		jwtSession:       sessionUC,
+		rc:               rc,
 	}
 }
 
@@ -63,7 +61,8 @@ func (u *userUC) Register(ctx context.Context, params *user.ParamsCreateUser) (*
 		Lastname:  params.Lastname,
 		Password:  params.HashPass(),
 		Email:     params.Email,
-		Role:      ClientRole,
+		Role:      string(user.ClientRole),
+		Verified:  user.DefaultVerifiedNo,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	})
@@ -77,28 +76,20 @@ func (u *userUC) Register(ctx context.Context, params *user.ParamsCreateUser) (*
 }
 
 func (u *userUC) Login(ctx context.Context, email string, password string) (*models.Tokens, error) {
-	// fmt.Println("init login")
+
 	foundUser, err := u.userRepoDatabase.FindByEmail(ctx, email)
 	if err != nil {
 		u.logger.Errorf("Login.FindByEmail: %v", err)
 		return nil, fmt.Errorf("Login.FindByEmail: %v", err)
 	}
 
-	// fmt.Println("found user")
-
 	if err := foundUser.ComparePass(password); err != nil {
 		u.logger.Errorf("Login: %v", ErrPasswordIncorrect)
 		return nil, ErrPasswordIncorrect
 	}
 
-	// fmt.Println("compare pass")
-
-	if foundUser.Verified == "no" {
+	if foundUser.Verified == user.DefaultVerifiedNo {
 		return nil, user.ErrUserNotVerified{}
-	}
-
-	if err := u.userRepoCache.Set(ctx, foundUser); err != nil {
-		u.logger.Warn("Login.Set: %v", err)
 	}
 
 	tokens, err := u.jwtSession.CreateTokens(ctx, foundUser.UserID, foundUser.Role)
@@ -107,8 +98,14 @@ func (u *userUC) Login(ctx context.Context, email string, password string) (*mod
 		return nil, fmt.Errorf("Login.CreateTokens: %v", err)
 	}
 
-	// u.logger.Info(tokens.Access)
-	// u.logger.Info(tokens.Refresh)
+	pipe := u.rc.Pipeline()
+
+	pipe.Set(ctx, user.FormatActiveSessionAccess(foundUser.UserID), tokens.Access, session.TtlExpAccessTTK)
+	pipe.Set(ctx, user.FormatActiveSessionRefresh(foundUser.UserID), tokens.Refresh, session.TtlExpRefreshTTK)
+	_, err = pipe.Exec(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("pipe.Exec: %w", err)
+	}
 
 	return &models.Tokens{
 		Access:  tokens.Access,
@@ -117,8 +114,23 @@ func (u *userUC) Login(ctx context.Context, email string, password string) (*mod
 
 }
 
-func (u *userUC) Logout(ctx context.Context, accessTTK string, refreshTTK string) error {
-	err := u.jwtSession.RevogeToken(ctx, accessTTK, refreshTTK)
+func (u *userUC) Logout(ctx context.Context, in *user.ParamLogoutInput) error {
+	mc, err := u.jwtSession.ValidToken(ctx, in.AccessToken)
+	id, ok := mc["id"].(string)
+	if !ok {
+
+	}
+
+	pipe := u.rc.Pipeline()
+	pipe.Del(ctx, user.FormatActiveSessionAccess(id))
+	pipe.Del(ctx, user.FormatActiveSessionRefresh(id))
+
+	_, err = pipe.Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("pipe.Exec: %w", err)
+	}
+
+	err = u.jwtSession.RevogeToken(ctx, in.AccessToken, in.RefreshToken)
 	if err != nil {
 		u.logger.Errorf("Logout.RevogeToken: %v", err)
 		return fmt.Errorf("Logout.RevogeToken: %v", err)
@@ -128,29 +140,11 @@ func (u *userUC) Logout(ctx context.Context, accessTTK string, refreshTTK string
 }
 
 func (u *userUC) FindByID(ctx context.Context, userID string) (*user.ParamsOutputUser, error) {
-	var (
-		foundUser *models.User
-		err       error
-	)
 
-	foundUser, err = u.userRepoCache.Get(ctx, userID)
-	if err == redis.Nil {
-		foundUser, err = u.userRepoDatabase.FindByID(ctx, userID)
-		if err != nil {
-			u.logger.Errorf("FindByID: %v", err)
-			return nil, fmt.Errorf("FindByID: %v", err)
-		}
-
-		if err := u.userRepoCache.Set(ctx, foundUser); err != nil {
-			u.logger.Warn("FindByID.Set: %v", err)
-		}
-
-		return user.Dto(foundUser), nil
-	}
-
+	foundUser, err := u.userRepoDatabase.FindByID(ctx, userID)
 	if err != nil {
-		u.logger.Errorf("FindByID.Get: %v", err)
-		return nil, fmt.Errorf("FindByID.Get: %v", err)
+		u.logger.Errorf("FindByID: %v", err)
+		return nil, fmt.Errorf("FindByID: %v", err)
 	}
 
 	return user.Dto(foundUser), nil
@@ -158,48 +152,45 @@ func (u *userUC) FindByID(ctx context.Context, userID string) (*user.ParamsOutpu
 
 func (u *userUC) FindByEmail(ctx context.Context, userEmail string) (*user.ParamsOutputUser, error) {
 
-	var (
-		foundUser *models.User
-		err       error
-	)
+	// var (
+	// 	foundUser *models.User
+	// 	err       error
+	// )
 
-	foundUser, err = u.userRepoCache.Get(ctx, userEmail)
-	if err == redis.Nil {
-		foundUser, err = u.userRepoDatabase.FindByEmail(ctx, userEmail)
-		if err != nil {
-			u.logger.Errorf("FindByEmail: %v", err)
-			return nil, fmt.Errorf("FindByEmail: %v", err)
-		}
-
-		if err := u.userRepoCache.Set(ctx, foundUser); err != nil {
-			u.logger.Warn("FindByEmail.Set: %v", err)
-		}
-
-		return user.Dto(foundUser), nil
-	}
-
+	// foundUser, err := u.userRepoCache.Get(ctx, userEmail)
+	// if err == redis.Nil {
+	foundUser, err := u.userRepoDatabase.FindByEmail(ctx, userEmail)
 	if err != nil {
-		u.logger.Errorf("FindByEmail.Get: %v", err)
-		return nil, fmt.Errorf("FindByEmail.Get: %v", err)
+		u.logger.Errorf("FindByEmail: %v", err)
+		return nil, fmt.Errorf("FindByEmail: %v", err)
 	}
+
+	// if err := u.userRepoCache.Set(ctx, foundUser); err != nil {
+	// 	u.logger.Warn("FindByEmail.Set: %v", err)
+	// }
 
 	return user.Dto(foundUser), nil
+	// }
+
+	// if err != nil {
+	// 	u.logger.Errorf("FindByEmail.Get: %v", err)
+	// 	return nil, fmt.Errorf("FindByEmail.Get: %v", err)
+	// }
+
+	// return user.Dto(foundUser), nil
 }
 
 func (u *userUC) Update(ctx context.Context, params *user.ParamsUpdateUser) (*user.ParamsOutputUser, error) {
-	if err := params.Validate(ctx); err != nil {
-		u.logger.Errorf("Update.Validate: %v", err)
-		return nil, errors.Wrap(err, "Update.Validate")
-	}
 
 	newUser, err := u.userRepoDatabase.Update(ctx,
 		&models.User{
 			UserID:    params.UserID,
 			Name:      params.Name,
 			Lastname:  params.Lastname,
-			Password:  params.Password,
+			Password:  params.HashPass(),
 			Email:     params.Email,
 			Verified:  params.Verified,
+			Role:      params.Role,
 			UpdatedAt: time.Now(),
 		},
 	)
@@ -222,22 +213,64 @@ func (u *userUC) ValidToken(ctx context.Context, params *user.ParamsValidToken) 
 		u.logger.Errorf("ValidToken: %v", err)
 		return nil, err
 	}
-	// u.logger.Info(claims)
+
+	userID := claims["id"].(string)
+
+	activeSession, err := u.rc.Get(ctx, user.FormatActiveSessionAccess(userID)).Result()
+	if err != nil && err != redis.Nil {
+		return nil, err
+	}
+
+	if err == redis.Nil && activeSession != params.AccessToken {
+		return nil, user.ErrSessionExpiredOrLoginNewDisp{}
+	}
 
 	return &user.ParamsJwtData{
-		UserID: claims["id"].(string),
+		UserID: userID,
 		Role:   claims["role"].(string),
 	}, nil
 }
 
 func (u *userUC) RefreshTokens(ctx context.Context, params *user.ParamsRefreshTokens) (*user.RefreshTokens, error) {
+
+	mc, err := u.jwtSession.GetClaimsRefreshToken(ctx, params.RefreshToken)
+	if err != nil {
+		return nil, fmt.Errorf("u.jwtSession.GetClaimsRefreshToken: %w", err)
+	}
+	userID, ok := mc["id"].(string)
+
+	if !ok {
+		return nil, errors.New("failed get user id for refresh token")
+	}
+
+	ractive, err := u.rc.Get(ctx, user.FormatActiveSessionRefresh(userID)).Result()
+	if err != nil && err != redis.Nil {
+		return nil, err
+	}
+
+	if err == redis.Nil || ractive != params.RefreshToken {
+		return nil, user.ErrSessionExpiredOrLoginNewDisp{}
+	}
+
 	tokens, err := u.jwtSession.RefreshToken(ctx, params.AccessToken, params.RefreshToken)
 	if err != nil {
 		return nil, err
 	}
 
-	return &user.RefreshTokens{
+	pipe := u.rc.Pipeline()
+
+	pipe.Set(ctx, user.FormatActiveSessionAccess(userID), tokens.Access, session.TtlExpAccessTTK)
+	pipe.Set(ctx, user.FormatActiveSessionRefresh(userID), tokens.Refresh, session.TtlExpRefreshTTK)
+
+	_, err = pipe.Exec(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("pipe.Exec: %w", err)
+	}
+
+	out := user.RefreshTokens{
 		AccessToken:  tokens.Access,
 		RefreshToken: tokens.Refresh,
-	}, nil
+	}
+
+	return &out, nil
 }

@@ -2,10 +2,12 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aclgo/grpc-jwt/internal/user"
 	"github.com/aclgo/grpc-jwt/pkg/grpc_errors"
 	"github.com/aclgo/grpc-jwt/proto"
+	"github.com/pkg/errors"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -54,27 +56,50 @@ func (us *UserService) Login(ctx context.Context, req *proto.UserLoginRequest) (
 func (us *UserService) Logout(ctx context.Context, req *proto.UserLogoutRequest) (*proto.UserLogoutResponse, error) {
 	accessTK, refreshTK := req.AccessToken, req.RefreshToken
 
-	if err := us.userUC.Logout(ctx, accessTK, refreshTK); err != nil {
+	paramLogout := user.ParamLogoutInput{
+		AccessToken:  accessTK,
+		RefreshToken: refreshTK,
+	}
+
+	if err := paramLogout.Validate(); err != nil {
+		return nil, fmt.Errorf("paramLogout.Validate: %w", err)
+	}
+
+	if err := us.userUC.Logout(ctx, &paramLogout); err != nil {
 		return nil, status.Errorf(grpc_errors.ParseGRPCErrors(err), "Logout: %v", err)
 	}
 
 	return &proto.UserLogoutResponse{}, nil
 }
 
-func (us *UserService) Refresh(ctx context.Context, req *proto.RefreshTokensRequest) (*proto.RefreshTokensResponse, error) {
-	tokens, err := us.RefreshTokens(ctx, &proto.RefreshTokensRequest{
+func (us *UserService) RefreshTokens(ctx context.Context, req *proto.RefreshTokensRequest) (*proto.RefreshTokensResponse, error) {
+
+	paramRefresh := user.ParamsRefreshTokens{
 		AccessToken:  req.AccessToken,
 		RefreshToken: req.RefreshToken,
-	})
-
-	if err != nil {
-		return nil, err
 	}
 
-	return &proto.RefreshTokensResponse{
+	if err := paramRefresh.Validate(); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	tokens, err := us.userUC.RefreshTokens(ctx, &paramRefresh)
+
+	//
+	// if tokens == nil {
+	// 	return nil, fmt.Errorf("us.userUC.RefreshTokens: tokens is nil")
+	// }
+
+	if err != nil {
+		return nil, fmt.Errorf("us.userUC.RefreshTokens: %w", err)
+	}
+
+	out := proto.RefreshTokensResponse{
 		AccessToken:  tokens.AccessToken,
 		RefreshToken: tokens.RefreshToken,
-	}, nil
+	}
+
+	return &out, nil
 }
 
 func (us *UserService) FindById(ctx context.Context, req *proto.FindByIdRequest) (*proto.FindByIdResponse, error) {
@@ -123,15 +148,22 @@ func (us *UserService) FindByEmail(ctx context.Context, req *proto.FindByEmailRe
 
 func (us *UserService) Update(ctx context.Context, req *proto.UpdateRequest) (*proto.UpdateResponse, error) {
 
+	params := user.ParamsUpdateUser{
+		UserID:   req.Id,
+		Name:     req.Name,
+		Lastname: req.Lastname,
+		Password: req.Password,
+		Email:    req.Email,
+		Verified: req.Verified,
+	}
+
+	if err := params.Validate(); err != nil {
+		return nil, errors.Wrap(err, "Update.Validate")
+	}
+
 	updatedUser, err := us.userUC.Update(
 		ctx,
-		&user.ParamsUpdateUser{
-			UserID:   req.Id,
-			Name:     req.Name,
-			Lastname: req.Lastname,
-			Password: req.Password,
-			Email:    req.Email,
-		},
+		&params,
 	)
 
 	if err != nil {
@@ -162,7 +194,7 @@ func (us *UserService) ValidateToken(ctx context.Context, req *proto.ValidateTok
 	}
 
 	return &proto.ValidateTokenResponse{
-		UserID:   resp.UserID,
+		UserId:   resp.UserID,
 		UserRole: resp.Role,
 	}, nil
 }
@@ -194,6 +226,7 @@ func parseModelsToProto(user *user.ParamsOutputUser) *proto.User {
 		Password:  user.Password,
 		Email:     user.Email,
 		Role:      user.Role,
+		Verified:  user.Verified,
 		CreatedAt: timestamppb.New(user.CreatedAt),
 		UpdatedAt: timestamppb.New(user.UpdatedAt),
 	}

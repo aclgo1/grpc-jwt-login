@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/aclgo/grpc-jwt/internal/models"
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 )
 
 const KeyUser = "user:"
@@ -31,11 +31,11 @@ func (r *redisRepo) Set(ctx context.Context, user *models.User) error {
 		return err
 	}
 
-	return r.redisClient.Set(formatKey(user.UserID), dataUser, 0).Err()
+	return r.redisClient.Set(ctx, formatKey(user.UserID), dataUser, 0).Err()
 }
 
 func (r *redisRepo) Get(ctx context.Context, userID string) (*models.User, error) {
-	dataUser, err := r.redisClient.Get(formatKey(userID)).Bytes()
+	dataUser, err := r.redisClient.Get(ctx, formatKey(userID)).Bytes()
 	if err != nil {
 		return nil, err
 	}
@@ -50,5 +50,5 @@ func (r *redisRepo) Get(ctx context.Context, userID string) (*models.User, error
 }
 
 func (r *redisRepo) Del(ctx context.Context, userID string) error {
-	return r.redisClient.Del(formatKey(userID)).Err()
+	return r.redisClient.Del(ctx, formatKey(userID)).Err()
 }

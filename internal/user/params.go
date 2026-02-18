@@ -6,7 +6,13 @@ import (
 	"time"
 
 	"github.com/aclgo/grpc-jwt/internal/models"
+	"github.com/aclgo/grpc-jwt/internal/utils"
 	"golang.org/x/crypto/bcrypt"
+)
+
+const (
+	ClientRole        = "client"
+	DefaultVerifiedNo = "no"
 )
 
 type ParamsCreateUser struct {
@@ -32,13 +38,30 @@ type ParamsUpdateUser struct {
 	Password  string
 	Email     string
 	Verified  string
+	Role      string
 	UpdatedAt time.Time
 }
 
-func (p *ParamsUpdateUser) Validate(ctx context.Context) error {
+func (p *ParamsUpdateUser) HashPass() string {
+	if p.Password == "" {
+		return ""
+	}
+
+	bc, _ := bcrypt.GenerateFromPassword([]byte(p.Password), bcrypt.DefaultCost)
+	return string(bc)
+}
+
+func (p *ParamsUpdateUser) Validate() error {
 	if p.UserID == "" {
 		return errors.New("user id empty")
 	}
+
+	if p.Email != "" {
+		if !utils.ValidMail(p.Email) {
+			return ErrUserInvalidEmail{}
+		}
+	}
+
 	return nil
 }
 
@@ -90,9 +113,50 @@ type ParamsRefreshTokens struct {
 	RefreshToken string
 }
 
+func (p *ParamsRefreshTokens) Validate() error {
+	if p.AccessToken == "" {
+		return errors.New("access token empty")
+	}
+
+	if p.RefreshToken == "" {
+		return errors.New("refresh token empty")
+	}
+
+	return nil
+}
+
 type RefreshTokens struct {
 	AccessToken  string
 	RefreshToken string
+}
+
+func (p *RefreshTokens) Validate() error {
+	if p.AccessToken == "" {
+		return errors.New("access token empty")
+	}
+
+	if p.RefreshToken == "" {
+		return errors.New("refresh token empty")
+	}
+
+	return nil
+}
+
+type ParamLogoutInput struct {
+	AccessToken  string
+	RefreshToken string
+}
+
+func (p *ParamLogoutInput) Validate() error {
+	if p.AccessToken == "" {
+		return errors.New("access token empty")
+	}
+
+	if p.RefreshToken == "" {
+		return errors.New("refresh token empty")
+	}
+
+	return nil
 }
 
 type ErrUserNotVerified struct {
@@ -100,4 +164,18 @@ type ErrUserNotVerified struct {
 
 func (e ErrUserNotVerified) Error() string {
 	return "user not verified"
+}
+
+type ErrUserInvalidEmail struct {
+}
+
+func (e ErrUserInvalidEmail) Error() string {
+	return "invalid email"
+}
+
+type ErrSessionExpiredOrLoginNewDisp struct {
+}
+
+func (e ErrSessionExpiredOrLoginNewDisp) Error() string {
+	return "session expired or login in new dispositivy"
 }

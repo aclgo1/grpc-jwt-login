@@ -11,7 +11,7 @@ import (
 const (
 	TypeAccessTTK    = "access"
 	TypeRefreshTTK   = "refresh"
-	TtlExpAccessTTK  = time.Hour
+	TtlExpAccessTTK  = time.Minute * 1
 	TtlExpRefreshTTK = time.Hour * 24
 )
 
@@ -21,4 +21,5 @@ type SessionUC interface {
 	ValidToken(context.Context, string) (jwt.MapClaims, error)
 	RevogeToken(context.Context, string, string) error
 	VerifyRevogedTokens(context.Context, string) error
+	GetClaimsRefreshToken(context.Context, string) (jwt.MapClaims, error)
 }

@@ -12,9 +12,9 @@ import (
 	"github.com/aclgo/grpc-jwt/internal/user/mock"
 	"github.com/aclgo/grpc-jwt/pkg/logger"
 	"github.com/alicebob/miniredis"
-	"github.com/go-redis/redis"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/require"
 )
 
@@ -42,7 +42,7 @@ func TestRegister(t *testing.T) {
 
 	sessUC := sessionUC.NewSessionUC(logger, setupRedis(), "my-secret-key")
 
-	userUC := NewUserUC(logger, userPGRepo, nil, sessUC)
+	userUC := NewUserUC(logger, userPGRepo, nil, sessUC, setupRedis())
 
 	uuidUser := uuid.NewString()
 	// now := time.Now()
@@ -88,7 +88,7 @@ func TestFindByID(t *testing.T) {
 
 	sessUC := sessionUC.NewSessionUC(logger, setupRedis(), "my-secret-key")
 
-	userUC := NewUserUC(logger, userPGRepo, nil, sessUC)
+	userUC := NewUserUC(logger, userPGRepo, nil, sessUC, setupRedis())
 
 	userID := uuid.NewString()
 
@@ -122,7 +122,7 @@ func TestFindByEmail(t *testing.T) {
 
 	sessUC := sessionUC.NewSessionUC(logger, setupRedis(), "my-secret-key")
 
-	userUC := NewUserUC(logger, userPGRepo, nil, sessUC)
+	userUC := NewUserUC(logger, userPGRepo, nil, sessUC, setupRedis())
 
 	userID := uuid.NewString()
 

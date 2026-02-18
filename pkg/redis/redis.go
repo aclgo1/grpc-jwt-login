@@ -1,10 +1,11 @@
 package rredis
 
 import (
+	"context"
 	"log"
 
 	"github.com/aclgo/grpc-jwt/config"
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 )
 
 func NewRedisClient(c *config.Config) *redis.Client {
@@ -15,7 +16,7 @@ func NewRedisClient(c *config.Config) *redis.Client {
 		PoolSize: 10000,
 	})
 
-	if err := client.Ping().Err(); err != nil {
+	if err := client.Ping(context.Background()).Err(); err != nil {
 		log.Fatalf("NewRedisClient.Ping: %v", err)
 	}
 

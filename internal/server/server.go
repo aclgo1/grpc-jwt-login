@@ -12,8 +12,8 @@ import (
 	userUC "github.com/aclgo/grpc-jwt/internal/user/usecase"
 	"github.com/aclgo/grpc-jwt/pkg/logger"
 	"github.com/aclgo/grpc-jwt/proto"
-	"github.com/go-redis/redis"
 	"github.com/jmoiron/sqlx"
+	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
 )
 
@@ -41,7 +41,7 @@ func (s *Server) Run() error {
 
 	usRepo := userRepo.NewPostgresRepo(s.db)
 	usRepoRedis := userRepo.NewredisRepo(s.redisClient)
-	userUC := userUC.NewUserUC(s.logger, usRepo, usRepoRedis, sessUC)
+	userUC := userUC.NewUserUC(s.logger, usRepo, usRepoRedis, sessUC, s.redisClient)
 
 	userService := service.NewUserService(s.logger, userUC)
 

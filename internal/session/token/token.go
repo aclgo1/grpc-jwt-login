@@ -50,7 +50,9 @@ func (j *tokenAction) ParseToken(tokenString string) (*jwt.Token, error) {
 }
 
 func (j *tokenAction) parseHS256(tokenString string, token *jwt.Token) (*jwt.Token, error) {
-	parse, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+	parser := jwt.Parser{SkipClaimsValidation: true}
+
+	parse, err := parser.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}

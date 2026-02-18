@@ -10,8 +10,8 @@ import (
 	sessionToken "github.com/aclgo/grpc-jwt/internal/session/token"
 	"github.com/aclgo/grpc-jwt/pkg/logger"
 
-	"github.com/go-redis/redis"
 	"github.com/golang-jwt/jwt"
+	redis "github.com/redis/go-redis/v9"
 )
 
 type sessionUC struct {
@@ -39,106 +39,169 @@ func (s *sessionUC) CreateTokens(ctx context.Context, userID, role string) (*mod
 
 func (s *sessionUC) RefreshToken(ctx context.Context, accessTTK, refreshTTK string) (*models.Token, error) {
 
-	err := s.verifyRevogedToken(ctx, refreshTTK)
+	err := s.verifyRevogedToken(ctx, session.FormatRefreshTokenRepo(refreshTTK))
 
-	if err != nil {
-		if err != redis.Nil {
-			parsedAccess, err := s.tokenAction.ParseToken(accessTTK)
-			if err != nil {
-				s.logger.Errorf("RefreshToken.ParseToken: %v", err)
-				return nil, fmt.Errorf("RefreshToken.ParseToken: %v", err)
-			}
+	if err == redis.Nil {
+		parsedAccess, err := s.tokenAction.ParseToken(accessTTK)
+		if err != nil && err != session.ErrTokenExpired {
 
-			parsedRefresh, err := s.tokenAction.ParseToken(refreshTTK)
-			if err != nil {
-				s.logger.Errorf("RefreshToken.ParseToken: %v", err)
-				return nil, fmt.Errorf("RefreshToken.ParseToken: %v", err)
-			}
+			s.logger.Errorf("RefreshToken.ParseToken: %v", err)
+			return nil, fmt.Errorf("RefreshToken.ParseToken: %v", err)
 
-			claimsAccess, err := s.tokenAction.GetClaims(parsedAccess)
-			if err != nil {
-				s.logger.Errorf("RefreshToken.GetClaims: %v", err)
-				return nil, fmt.Errorf("RefreshToken.GetClaims: %v", err)
-			}
-
-			claimsRefresh, err := s.tokenAction.GetClaims(parsedRefresh)
-			if err != nil {
-				s.logger.Errorf("RefreshToken.GetClaims: %v", err)
-				return nil, fmt.Errorf("RefreshToken.GetClaims: %v", err)
-			}
-
-			idAccess, _ := claimsAccess["id"].(string)
-			idRefresh, _ := claimsRefresh["id"].(string)
-			typeRefresh, _ := claimsRefresh["type"].(string)
-
-			if idAccess != idRefresh {
-				return nil, session.ErrMistachTokenID
-			}
-
-			if typeRefresh != session.TypeRefreshTTK {
-				return nil, session.ErrTypeTokenInvalid
-			}
-
-			role, _ := claimsAccess["role"].(string)
-
-			return s.createTokens(ctx, idRefresh, role)
 		}
 
-		return nil, err
+		parsedRefresh, err := s.tokenAction.ParseToken(refreshTTK)
+		if err != nil {
+			s.logger.Errorf("RefreshToken.ParseToken: %v", err)
+			return nil, fmt.Errorf("RefreshToken.ParseToken: %v", err)
+		}
+
+		claimsAccess, err := s.tokenAction.GetClaims(parsedAccess)
+		if err != nil {
+			s.logger.Errorf("RefreshToken.GetClaims: %v", err)
+			return nil, fmt.Errorf("RefreshToken.GetClaims: %v", err)
+		}
+
+		claimsRefresh, err := s.tokenAction.GetClaims(parsedRefresh)
+		if err != nil {
+			s.logger.Errorf("RefreshToken.GetClaims: %v", err)
+			return nil, fmt.Errorf("RefreshToken.GetClaims: %v", err)
+		}
+
+		expUnixRefresh := claimsRefresh["exp"].(float64)
+		if s.tokenAction.IsExpired(expUnixRefresh) {
+			return nil, session.ErrTokenExpired
+		}
+
+		idAccess, _ := claimsAccess["id"].(string)
+		idRefresh, _ := claimsRefresh["id"].(string)
+		typeRefresh, _ := claimsRefresh["type"].(string)
+
+		if idAccess != idRefresh {
+			return nil, session.ErrMistachTokenID
+		}
+
+		if typeRefresh != session.TypeRefreshTTK {
+			return nil, session.ErrTypeTokenInvalid
+		}
+
+		role, _ := claimsAccess["role"].(string)
+
+		// if err := s.tokenRepo.Set(ctx, accessTTK, session.TtlExpAccessTTK); err != nil {
+		// 	return nil, fmt.Errorf("s.tokenRepo.Set: %w", err)
+		// }
+
+		if err := s.tokenRepo.Set(ctx, session.FormatRefreshTokenRepo(refreshTTK), session.TtlExpRefreshTTK); err != nil {
+			return nil, fmt.Errorf("s.tokenRepo.Set: %w", err)
+		}
+
+		return s.createTokens(ctx, idRefresh, role)
 	}
 
 	return nil, session.ErrTokenRevoged
 }
 
 func (s *sessionUC) ValidToken(ctx context.Context, ttkString string) (jwt.MapClaims, error) {
-	parsedAccess, err := s.tokenAction.ParseToken(ttkString)
-	if err != nil {
-		s.logger.Error(session.ErrInvalidToken)
-		return nil, session.ErrInvalidToken
-	}
 
-	claimsAccess, err := s.tokenAction.GetClaims(parsedAccess)
-	if err != nil {
-		s.logger.Error(session.ErrInvalidToken)
-		return nil, session.ErrInvalidToken
-	}
-
-	expUnix := claimsAccess["exp"].(float64)
-	if s.tokenAction.IsExpired(expUnix) {
-		s.logger.Error(session.ErrTokenExpired)
-		return nil, session.ErrTokenExpired
-	}
-
-	if err := s.verifyRevogedToken(ctx, ttkString); err != nil {
-		if err == redis.Nil {
-			return claimsAccess, nil
+	err := s.verifyRevogedToken(ctx, session.FormatAccessTokenRepo(ttkString))
+	if err == redis.Nil {
+		parsedAccess, err := s.tokenAction.ParseToken(ttkString)
+		if err != nil {
+			s.logger.Error(session.ErrInvalidToken)
+			return nil, session.ErrInvalidToken
 		}
 
-		return nil, err
+		claimsAccess, err := s.tokenAction.GetClaims(parsedAccess)
+		if err != nil {
+			s.logger.Error(session.ErrInvalidToken)
+			return nil, session.ErrInvalidToken
+		}
+
+		expUnix := claimsAccess["exp"].(float64)
+		if s.tokenAction.IsExpired(expUnix) {
+			s.logger.Error(session.ErrTokenExpired)
+			return nil, session.ErrTokenExpired
+		}
+
+		if claimsAccess["type"].(string) != string(session.TypeAccessTTK) {
+			return nil, session.ErrTypeTokenInvalid
+		}
+
+		return claimsAccess, nil
 	}
 
-	return nil, session.ErrTokenRevoged
+	if err == nil {
+		return nil, session.ErrTokenRevoged
+	}
+
+	return nil, err
+}
+
+func (s *sessionUC) GetClaimsRefreshToken(ctx context.Context, ttkString string) (jwt.MapClaims, error) {
+
+	err := s.verifyRevogedToken(ctx, session.FormatRefreshTokenRepo(ttkString))
+	if err == redis.Nil {
+		parsedRefresh, err := s.tokenAction.ParseToken(ttkString)
+		if err != nil {
+			s.logger.Error(session.ErrInvalidToken)
+			return nil, session.ErrInvalidToken
+		}
+
+		claimsRefresh, err := s.tokenAction.GetClaims(parsedRefresh)
+		if err != nil {
+			s.logger.Error(session.ErrInvalidToken)
+			return nil, session.ErrInvalidToken
+		}
+
+		expUnix := claimsRefresh["exp"].(float64)
+		if s.tokenAction.IsExpired(expUnix) {
+			s.logger.Error(session.ErrTokenExpired)
+			return nil, session.ErrTokenExpired
+		}
+
+		if claimsRefresh["type"].(string) != string(session.TypeRefreshTTK) {
+			return nil, session.ErrTypeTokenInvalid
+		}
+
+		return claimsRefresh, nil
+	}
+
+	if err == nil {
+		return nil, session.ErrTokenRevoged
+	}
+
+	return nil, err
 }
 
 func (s *sessionUC) RevogeToken(ctx context.Context, ttkAccess, ttkRefresh string) error {
 
-	err := s.tokenRepo.Set(
+	err := s.verifyRevogedToken(ctx, session.FormatAccessTokenRepo(ttkAccess))
+	if err == nil {
+		return fmt.Errorf("verifyRevogedToken: token access has been revoged")
+	}
+
+	err = s.verifyRevogedToken(ctx, session.FormatRefreshTokenRepo(ttkRefresh))
+	if err == nil {
+		return fmt.Errorf("verifyRevogedToken: token refresh has been revoged")
+	}
+
+	errset := s.tokenRepo.Set(
 		ctx,
-		ttkAccess,
+		session.FormatAccessTokenRepo(ttkAccess),
 		session.TtlExpAccessTTK,
 	)
 
-	if err != nil {
+	if errset != nil {
 		s.logger.Errorf("RevogeToken.Set: %v", err)
 		return fmt.Errorf("RevogeToken.Set: %v", err)
 	}
 
-	err = s.tokenRepo.Set(ctx,
-		ttkRefresh,
+	errset = s.tokenRepo.Set(ctx,
+		session.FormatRefreshTokenRepo(ttkRefresh),
 		session.TtlExpRefreshTTK,
 	)
 
-	if err != nil {
+	if errset != nil {
 		s.logger.Errorf("RevogeToken.Set: %v", err)
 		return fmt.Errorf("RevogeToken.Set: %v", err)
 	}
@@ -147,7 +210,7 @@ func (s *sessionUC) RevogeToken(ctx context.Context, ttkAccess, ttkRefresh strin
 }
 
 func (s *sessionUC) VerifyRevogedTokens(ctx context.Context, ttkString string) error {
-	return s.verifyRevogedToken(ctx, session.FormatKeyRevogedToken(session.DefaultKeyRevogedTokenAccess, ttkString))
+	return s.verifyRevogedToken(ctx, ttkString)
 }
 
 func (s *sessionUC) verifyRevogedToken(ctx context.Context, ttkString string) error {
@@ -159,7 +222,7 @@ func (s *sessionUC) verifyRevogedToken(ctx context.Context, ttkString string) er
 	return nil
 }
 
-func (s *sessionUC) createTokens(ctx context.Context, userID, role string) (*models.Token, error) {
+func (s *sessionUC) createTokens(_ context.Context, userID, role string) (*models.Token, error) {
 	access, err := s.tokenAction.NewToken(session.TypeAccessTTK, userID, role, session.TtlExpAccessTTK)
 	if err != nil {
 		return nil, err
@@ -170,8 +233,10 @@ func (s *sessionUC) createTokens(ctx context.Context, userID, role string) (*mod
 		return nil, err
 	}
 
-	return &models.Token{
+	out := models.Token{
 		Access:  access,
 		Refresh: refresh,
-	}, nil
+	}
+
+	return &out, nil
 }

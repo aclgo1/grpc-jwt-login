@@ -1,12 +1,18 @@
-up:
-    sudo docker compose up --build -d
-migrate:
-    migrate -database postgres://grpc-jwt:grpc-jwt@localhost:5432/grpc-jwt?sslmode=disable -path migrate up 1
-# migrate_down:
-#     migrate -database postgres://grpc-jwt:grpc-jwt@localhost:5432/grpc-jwt?sslmode=disable -path migrations down 1
-gorun:
-    go run cmd/grpc-jwt/main.go
-# protoc:
-     protoc --go_out=. --go_opt=paths=source_relative \
-     --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-     user.proto
+PROTO_DIR := ./proto
+OUT_DIR   := ./proto
+# Busca automaticamente todos os arquivos .proto na pasta
+PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
+
+# Garante que o PATH inclua os binários do Go
+export PATH := $(PATH):$(shell go env GOPATH)/bin
+
+.PHONY: proto clean
+
+# Comando principal: make proto
+proto: $(PROTO_FILES)
+	@echo "Gerando arquivos Go a partir dos protos..."
+	protoc --proto_path=$(PROTO_DIR) \
+		--go_out=$(OUT_DIR) --go_opt=paths=source_relative \
+		--go-grpc_out=$(OUT_DIR) --go-grpc_opt=paths=source_relative \
+		$(PROTO_FILES)
+	@echo "Concluído."

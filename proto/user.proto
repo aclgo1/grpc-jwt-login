@@ -91,18 +91,18 @@ message ValidateTokenRequest {
 }
 
 message ValidateTokenResponse {
-    string UserID = 1;
-    string UserRole = 2;
+    string user_id = 1;
+    string user_role = 2;
 }
 
 message RefreshTokensRequest {
-    string accessToken = 1;
-    string refreshToken = 2;
+    string access_token = 1;
+    string refresh_token = 2;
 }
 
 message RefreshTokensResponse {
-    string accessToken = 1;
-    string refreshToken = 2;
+    string access_token = 1;
+    string refresh_token = 2;
 }
 
 service UserService {
