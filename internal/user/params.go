@@ -179,3 +179,10 @@ type ErrSessionExpiredOrLoginNewDisp struct {
 func (e ErrSessionExpiredOrLoginNewDisp) Error() string {
 	return "session expired or login in new dispositivy"
 }
+
+type ErrInvalidTokenClaims struct {
+}
+
+func (e ErrInvalidTokenClaims) Error() string {
+	return "invalid token claims"
+}

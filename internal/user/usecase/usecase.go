@@ -214,14 +214,20 @@ func (u *userUC) ValidToken(ctx context.Context, params *user.ParamsValidToken) 
 		return nil, err
 	}
 
-	userID := claims["id"].(string)
+	userID, ok := claims["id"].(string)
+	if !ok {
+		return nil, user.ErrInvalidTokenClaims{}
+	}
 
 	activeSession, err := u.rc.Get(ctx, user.FormatActiveSessionAccess(userID)).Result()
-	if err != nil && err != redis.Nil {
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return nil, user.ErrSessionExpiredOrLoginNewDisp{}
+		}
 		return nil, err
 	}
 
-	if err == redis.Nil && activeSession != params.AccessToken {
+	if activeSession != params.AccessToken {
 		return nil, user.ErrSessionExpiredOrLoginNewDisp{}
 	}
 
