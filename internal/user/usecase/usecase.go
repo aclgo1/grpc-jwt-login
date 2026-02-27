@@ -118,7 +118,7 @@ func (u *userUC) Logout(ctx context.Context, in *user.ParamLogoutInput) error {
 	mc, err := u.jwtSession.ValidToken(ctx, in.AccessToken)
 	id, ok := mc["id"].(string)
 	if !ok {
-
+		return user.ErrInvalidTokenClaims{}
 	}
 
 	pipe := u.rc.Pipeline()
@@ -250,11 +250,14 @@ func (u *userUC) RefreshTokens(ctx context.Context, params *user.ParamsRefreshTo
 	}
 
 	ractive, err := u.rc.Get(ctx, user.FormatActiveSessionRefresh(userID)).Result()
-	if err != nil && err != redis.Nil {
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return nil, user.ErrSessionExpiredOrLoginNewDisp{}
+		}
 		return nil, err
 	}
 
-	if err == redis.Nil || ractive != params.RefreshToken {
+	if ractive != params.RefreshToken {
 		return nil, user.ErrSessionExpiredOrLoginNewDisp{}
 	}
 
