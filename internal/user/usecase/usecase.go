@@ -62,7 +62,7 @@ func (u *userUC) Register(ctx context.Context, params *user.ParamsCreateUser) (*
 		Password:  params.HashPass(),
 		Email:     params.Email,
 		Role:      string(user.ClientRole),
-		Verified:  user.DefaultVerifiedNo,
+		Verified:  user.DefaultVerifiedYes,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	})

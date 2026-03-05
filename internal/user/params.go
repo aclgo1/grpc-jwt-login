@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	ClientRole        = "client"
-	DefaultVerifiedNo = "no"
+	ClientRole         = "client"
+	DefaultVerifiedNo  = "no"
+	DefaultVerifiedYes = "yes"
 )
 
 type ParamsCreateUser struct {
