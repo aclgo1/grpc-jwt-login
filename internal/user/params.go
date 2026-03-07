@@ -174,11 +174,18 @@ func (e ErrUserInvalidEmail) Error() string {
 	return "invalid email"
 }
 
-type ErrSessionExpiredOrLoginNewDisp struct {
+type ErrLoginNewDisp struct {
 }
 
-func (e ErrSessionExpiredOrLoginNewDisp) Error() string {
-	return "session expired or login in new dispositivy"
+func (e ErrLoginNewDisp) Error() string {
+	return "login in new dispositivy"
+}
+
+type ErrSessionExpired struct {
+}
+
+func (e ErrSessionExpired) Error() string {
+	return "session expired"
 }
 
 type ErrInvalidTokenClaims struct {

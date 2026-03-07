@@ -222,13 +222,13 @@ func (u *userUC) ValidToken(ctx context.Context, params *user.ParamsValidToken) 
 	activeSession, err := u.rc.Get(ctx, user.FormatActiveSessionAccess(userID)).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			return nil, user.ErrSessionExpiredOrLoginNewDisp{}
+			return nil, user.ErrSessionExpired{}
 		}
 		return nil, err
 	}
 
 	if activeSession != params.AccessToken {
-		return nil, user.ErrSessionExpiredOrLoginNewDisp{}
+		return nil, user.ErrLoginNewDisp{}
 	}
 
 	return &user.ParamsJwtData{
@@ -252,13 +252,13 @@ func (u *userUC) RefreshTokens(ctx context.Context, params *user.ParamsRefreshTo
 	ractive, err := u.rc.Get(ctx, user.FormatActiveSessionRefresh(userID)).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			return nil, user.ErrSessionExpiredOrLoginNewDisp{}
+			return nil, user.ErrSessionExpired{}
 		}
 		return nil, err
 	}
 
 	if ractive != params.RefreshToken {
-		return nil, user.ErrSessionExpiredOrLoginNewDisp{}
+		return nil, user.ErrLoginNewDisp{}
 	}
 
 	tokens, err := u.jwtSession.RefreshToken(ctx, params.AccessToken, params.RefreshToken)
