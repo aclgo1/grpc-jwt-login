@@ -241,7 +241,7 @@ func (u *userUC) RefreshTokens(ctx context.Context, params *user.ParamsRefreshTo
 
 	mc, err := u.jwtSession.GetClaimsRefreshToken(ctx, params.RefreshToken)
 	if err != nil {
-		u.logger.Errorf("u.jwtSession.GetClaimsRefreshToken: %w", err)
+		u.logger.Errorf("u.jwtSession.GetClaimsRefreshToken: %v", err)
 		return nil, fmt.Errorf("u.jwtSession.GetClaimsRefreshToken: %w", err)
 	}
 	userID, ok := mc["id"].(string)
@@ -281,6 +281,8 @@ func (u *userUC) RefreshTokens(ctx context.Context, params *user.ParamsRefreshTo
 		AccessToken:  tokens.Access,
 		RefreshToken: tokens.Refresh,
 	}
+
+	u.logger.Info("refresh tokens success", out.AccessToken, out.RefreshToken)
 
 	return &out, nil
 }
