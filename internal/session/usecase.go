@@ -9,11 +9,19 @@ import (
 )
 
 const (
-	TypeAccessTTK    = "access"
-	TypeRefreshTTK   = "refresh"
+	TypeAccessTTK  = "access"
+	TypeRefreshTTK = "refresh"
+)
+
+var (
 	TtlExpAccessTTK  = time.Minute * 1
 	TtlExpRefreshTTK = time.Hour * 24
 )
+
+func SetSettingsSession(timeExpirateAccessToken, timeExpirateRefreshToken time.Duration) {
+	TtlExpAccessTTK = timeExpirateAccessToken
+	TtlExpRefreshTTK = timeExpirateRefreshToken
+}
 
 type SessionUC interface {
 	CreateTokens(context.Context, string, string) (*models.Token, error)
