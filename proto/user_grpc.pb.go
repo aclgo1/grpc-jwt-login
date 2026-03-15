@@ -28,6 +28,7 @@ const (
 	UserService_Delete_FullMethodName        = "/UserService/Delete"
 	UserService_ValidateToken_FullMethodName = "/UserService/ValidateToken"
 	UserService_RefreshTokens_FullMethodName = "/UserService/RefreshTokens"
+	UserService_GetStatsConns_FullMethodName = "/UserService/GetStatsConns"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -43,6 +44,7 @@ type UserServiceClient interface {
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 	ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error)
 	RefreshTokens(ctx context.Context, in *RefreshTokensRequest, opts ...grpc.CallOption) (*RefreshTokensResponse, error)
+	GetStatsConns(ctx context.Context, in *GetStatsConnsRequest, opts ...grpc.CallOption) (*GetStatsConnsResponse, error)
 }
 
 type userServiceClient struct {
@@ -143,6 +145,16 @@ func (c *userServiceClient) RefreshTokens(ctx context.Context, in *RefreshTokens
 	return out, nil
 }
 
+func (c *userServiceClient) GetStatsConns(ctx context.Context, in *GetStatsConnsRequest, opts ...grpc.CallOption) (*GetStatsConnsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetStatsConnsResponse)
+	err := c.cc.Invoke(ctx, UserService_GetStatsConns_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -156,6 +168,7 @@ type UserServiceServer interface {
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
 	ValidateToken(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error)
 	RefreshTokens(context.Context, *RefreshTokensRequest) (*RefreshTokensResponse, error)
+	GetStatsConns(context.Context, *GetStatsConnsRequest) (*GetStatsConnsResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -192,6 +205,9 @@ func (UnimplementedUserServiceServer) ValidateToken(context.Context, *ValidateTo
 }
 func (UnimplementedUserServiceServer) RefreshTokens(context.Context, *RefreshTokensRequest) (*RefreshTokensResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RefreshTokens not implemented")
+}
+func (UnimplementedUserServiceServer) GetStatsConns(context.Context, *GetStatsConnsRequest) (*GetStatsConnsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetStatsConns not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -376,6 +392,24 @@ func _UserService_RefreshTokens_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetStatsConns_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetStatsConnsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetStatsConns(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetStatsConns_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetStatsConns(ctx, req.(*GetStatsConnsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -418,6 +452,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RefreshTokens",
 			Handler:    _UserService_RefreshTokens_Handler,
+		},
+		{
+			MethodName: "GetStatsConns",
+			Handler:    _UserService_GetStatsConns_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -199,6 +199,16 @@ func (us *UserService) ValidateToken(ctx context.Context, req *proto.ValidateTok
 	}, nil
 }
 
+func (us *UserService) GetConnsStast(ctx context.Context, req *proto.GetStatsConnsRequest) (*proto.GetStatsConnsResponse, error) {
+
+	conns, err := us.userUC.GetConnsOnlineUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.GetStatsConnsResponse{Conns: int64(conns)}, nil
+}
+
 // func (us *UserService) getToken(ctx context.Context, key string) (string, error) {
 // 	md, ok := metadata.FromIncomingContext(ctx)
 // 	if !ok {

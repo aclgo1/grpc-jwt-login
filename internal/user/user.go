@@ -31,6 +31,7 @@ type UserUC interface {
 	Logout(context.Context, *ParamLogoutInput) error
 	ValidToken(context.Context, *ParamsValidToken) (*ParamsJwtData, error)
 	RefreshTokens(context.Context, *ParamsRefreshTokens) (*RefreshTokens, error)
+	GetConnsOnlineUser(ctx context.Context) (int, error)
 }
 
 func FormatActiveSessionAccess(s string) string {

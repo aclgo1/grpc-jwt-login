@@ -105,6 +105,14 @@ message RefreshTokensResponse {
     string refresh_token = 2;
 }
 
+message GetStatsConnsRequest{
+
+}
+
+message GetStatsConnsResponse{
+    int64 conns = 1;
+}
+
 service UserService {
     rpc Register(CreateUserRequest) returns (CreatedUserResponse);
     rpc Login(UserLoginRequest)returns (UserLoginResponse);
@@ -115,5 +123,7 @@ service UserService {
     rpc Delete(DeleteRequest) returns (DeleteResponse);
     rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
     rpc RefreshTokens(RefreshTokensRequest) returns (RefreshTokensResponse);
+    rpc GetStatsConns(GetStatsConnsRequest) returns (GetStatsConnsResponse);
+
 }
 

@@ -1062,6 +1062,86 @@ func (x *RefreshTokensResponse) GetRefreshToken() string {
 	return ""
 }
 
+type GetStatsConnsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetStatsConnsRequest) Reset() {
+	*x = GetStatsConnsRequest{}
+	mi := &file_user_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetStatsConnsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetStatsConnsRequest) ProtoMessage() {}
+
+func (x *GetStatsConnsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetStatsConnsRequest.ProtoReflect.Descriptor instead.
+func (*GetStatsConnsRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{20}
+}
+
+type GetStatsConnsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Conns         int64                  `protobuf:"varint,1,opt,name=conns,proto3" json:"conns,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetStatsConnsResponse) Reset() {
+	*x = GetStatsConnsResponse{}
+	mi := &file_user_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetStatsConnsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetStatsConnsResponse) ProtoMessage() {}
+
+func (x *GetStatsConnsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetStatsConnsResponse.ProtoReflect.Descriptor instead.
+func (*GetStatsConnsResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *GetStatsConnsResponse) GetConns() int64 {
+	if x != nil {
+		return x.Conns
+	}
+	return 0
+}
+
 var File_user_proto protoreflect.FileDescriptor
 
 const file_user_proto_rawDesc = "" +
@@ -1129,7 +1209,10 @@ const file_user_proto_rawDesc = "" +
 	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\"_\n" +
 	"\x15RefreshTokensResponse\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
-	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken2\xe7\x03\n" +
+	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\"\x16\n" +
+	"\x14GetStatsConnsRequest\"-\n" +
+	"\x15GetStatsConnsResponse\x12\x14\n" +
+	"\x05conns\x18\x01 \x01(\x03R\x05conns2\xa7\x04\n" +
 	"\vUserService\x124\n" +
 	"\bRegister\x12\x12.CreateUserRequest\x1a\x14.CreatedUserResponse\x12.\n" +
 	"\x05Login\x12\x11.UserLoginRequest\x1a\x12.UserLoginResponse\x121\n" +
@@ -1139,7 +1222,8 @@ const file_user_proto_rawDesc = "" +
 	"\x06Update\x12\x0e.UpdateRequest\x1a\x0f.UpdateResponse\x12)\n" +
 	"\x06Delete\x12\x0e.DeleteRequest\x1a\x0f.DeleteResponse\x12>\n" +
 	"\rValidateToken\x12\x15.ValidateTokenRequest\x1a\x16.ValidateTokenResponse\x12>\n" +
-	"\rRefreshTokens\x12\x15.RefreshTokensRequest\x1a\x16.RefreshTokensResponseB!Z\x1fgithub.com/aclgo/grpc-jwt/protob\x06proto3"
+	"\rRefreshTokens\x12\x15.RefreshTokensRequest\x1a\x16.RefreshTokensResponse\x12>\n" +
+	"\rGetStatsConns\x12\x15.GetStatsConnsRequest\x1a\x16.GetStatsConnsResponseB!Z\x1fgithub.com/aclgo/grpc-jwt/protob\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once
@@ -1153,7 +1237,7 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_user_proto_goTypes = []any{
 	(*User)(nil),                  // 0: User
 	(*CreateUserRequest)(nil),     // 1: CreateUserRequest
@@ -1175,11 +1259,13 @@ var file_user_proto_goTypes = []any{
 	(*ValidateTokenResponse)(nil), // 17: ValidateTokenResponse
 	(*RefreshTokensRequest)(nil),  // 18: RefreshTokensRequest
 	(*RefreshTokensResponse)(nil), // 19: RefreshTokensResponse
-	(*timestamppb.Timestamp)(nil), // 20: google.protobuf.Timestamp
+	(*GetStatsConnsRequest)(nil),  // 20: GetStatsConnsRequest
+	(*GetStatsConnsResponse)(nil), // 21: GetStatsConnsResponse
+	(*timestamppb.Timestamp)(nil), // 22: google.protobuf.Timestamp
 }
 var file_user_proto_depIdxs = []int32{
-	20, // 0: User.created_at:type_name -> google.protobuf.Timestamp
-	20, // 1: User.updated_at:type_name -> google.protobuf.Timestamp
+	22, // 0: User.created_at:type_name -> google.protobuf.Timestamp
+	22, // 1: User.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 2: CreatedUserResponse.user:type_name -> User
 	4,  // 3: UserLoginResponse.tokens:type_name -> Tokens
 	0,  // 4: FindByIdResponse.user:type_name -> User
@@ -1194,17 +1280,19 @@ var file_user_proto_depIdxs = []int32{
 	14, // 13: UserService.Delete:input_type -> DeleteRequest
 	16, // 14: UserService.ValidateToken:input_type -> ValidateTokenRequest
 	18, // 15: UserService.RefreshTokens:input_type -> RefreshTokensRequest
-	2,  // 16: UserService.Register:output_type -> CreatedUserResponse
-	5,  // 17: UserService.Login:output_type -> UserLoginResponse
-	7,  // 18: UserService.Logout:output_type -> UserLogoutResponse
-	9,  // 19: UserService.FindById:output_type -> FindByIdResponse
-	11, // 20: UserService.FindByEmail:output_type -> FindByEmailResponse
-	13, // 21: UserService.Update:output_type -> UpdateResponse
-	15, // 22: UserService.Delete:output_type -> DeleteResponse
-	17, // 23: UserService.ValidateToken:output_type -> ValidateTokenResponse
-	19, // 24: UserService.RefreshTokens:output_type -> RefreshTokensResponse
-	16, // [16:25] is the sub-list for method output_type
-	7,  // [7:16] is the sub-list for method input_type
+	20, // 16: UserService.GetStatsConns:input_type -> GetStatsConnsRequest
+	2,  // 17: UserService.Register:output_type -> CreatedUserResponse
+	5,  // 18: UserService.Login:output_type -> UserLoginResponse
+	7,  // 19: UserService.Logout:output_type -> UserLogoutResponse
+	9,  // 20: UserService.FindById:output_type -> FindByIdResponse
+	11, // 21: UserService.FindByEmail:output_type -> FindByEmailResponse
+	13, // 22: UserService.Update:output_type -> UpdateResponse
+	15, // 23: UserService.Delete:output_type -> DeleteResponse
+	17, // 24: UserService.ValidateToken:output_type -> ValidateTokenResponse
+	19, // 25: UserService.RefreshTokens:output_type -> RefreshTokensResponse
+	21, // 26: UserService.GetStatsConns:output_type -> GetStatsConnsResponse
+	17, // [17:27] is the sub-list for method output_type
+	7,  // [7:17] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
 	7,  // [7:7] is the sub-list for extension extendee
 	0,  // [0:7] is the sub-list for field type_name
@@ -1221,7 +1309,7 @@ func file_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   20,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

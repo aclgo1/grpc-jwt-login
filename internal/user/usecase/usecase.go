@@ -286,3 +286,19 @@ func (u *userUC) RefreshTokens(ctx context.Context, params *user.ParamsRefreshTo
 
 	return &out, nil
 }
+
+func (u *userUC) GetConnsOnlineUser(ctx context.Context) (int, error) {
+	iter := u.rc.Scan(ctx, 0, user.FormatActiveSessionAccess("*"), 0).Iterator()
+
+	var count int
+
+	for iter.Next(ctx) {
+		count++
+	}
+
+	if err := iter.Err(); err != nil {
+		return 0, fmt.Errorf("iter.Err: %w", err)
+	}
+
+	return count, nil
+}
