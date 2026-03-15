@@ -199,7 +199,7 @@ func (us *UserService) ValidateToken(ctx context.Context, req *proto.ValidateTok
 	}, nil
 }
 
-func (us *UserService) GetConnsStast(ctx context.Context, req *proto.GetStatsConnsRequest) (*proto.GetStatsConnsResponse, error) {
+func (us *UserService) GetStatsConns(ctx context.Context, req *proto.GetStatsConnsRequest) (*proto.GetStatsConnsResponse, error) {
 
 	conns, err := us.userUC.GetConnsOnlineUser(ctx)
 	if err != nil {
