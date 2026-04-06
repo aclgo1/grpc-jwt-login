@@ -107,6 +107,8 @@ func (u *userUC) Login(ctx context.Context, email string, password string) (*mod
 		return nil, fmt.Errorf("pipe.Exec: %w", err)
 	}
 
+	u.rc.Publish(ctx, "disconnect_channel", foundUser.UserID)
+
 	return &models.Tokens{
 		Access:  tokens.Access,
 		Refresh: tokens.Refresh,
@@ -129,6 +131,8 @@ func (u *userUC) Logout(ctx context.Context, in *user.ParamLogoutInput) error {
 	if err != nil {
 		return fmt.Errorf("pipe.Exec: %w", err)
 	}
+
+	u.rc.Publish(ctx, "disconnect_channel", id)
 
 	err = u.jwtSession.RevogeToken(ctx, in.AccessToken, in.RefreshToken)
 	if err != nil {
@@ -276,6 +280,8 @@ func (u *userUC) RefreshTokens(ctx context.Context, params *user.ParamsRefreshTo
 	if err != nil {
 		return nil, fmt.Errorf("pipe.Exec: %w", err)
 	}
+
+	u.rc.Publish(ctx, "disconnect_channel", userID)
 
 	out := user.RefreshTokens{
 		AccessToken:  tokens.Access,
