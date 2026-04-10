@@ -281,7 +281,7 @@ func (u *userUC) RefreshTokens(ctx context.Context, params *user.ParamsRefreshTo
 		return nil, fmt.Errorf("pipe.Exec: %w", err)
 	}
 
-	u.rc.Publish(ctx, "disconnect_channel", u.formatTokenDisconnectChannel(userID))
+	// u.rc.Publish(ctx, "disconnect_channel", u.formatTokenDisconnectChannel(userID))
 
 	out := user.RefreshTokens{
 		AccessToken:  tokens.Access,
