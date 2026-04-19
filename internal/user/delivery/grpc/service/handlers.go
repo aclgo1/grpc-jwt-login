@@ -7,7 +7,6 @@ import (
 	"github.com/aclgo/grpc-jwt/internal/user"
 	"github.com/aclgo/grpc-jwt/pkg/grpc_errors"
 	"github.com/aclgo/grpc-jwt/proto"
-	"github.com/pkg/errors"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -91,7 +90,7 @@ func (us *UserService) RefreshTokens(ctx context.Context, req *proto.RefreshToke
 	// }
 
 	if err != nil {
-		return nil, fmt.Errorf("us.userUC.RefreshTokens: %w", err)
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	out := proto.RefreshTokensResponse{
@@ -116,7 +115,7 @@ func (us *UserService) FindById(ctx context.Context, req *proto.FindByIdRequest)
 
 	found, err := us.userUC.FindByID(ctx, id)
 	if err != nil {
-		return nil, status.Errorf(grpc_errors.ParseGRPCErrors(err), "userUC.FindByID: %vs", err)
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrors(err), "userUC.FindByID: %v", err)
 	}
 
 	return &proto.FindByIdResponse{
@@ -158,9 +157,8 @@ func (us *UserService) Update(ctx context.Context, req *proto.UpdateRequest) (*p
 	}
 
 	if err := params.Validate(); err != nil {
-		return nil, errors.Wrap(err, "Update.Validate")
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-
 	updatedUser, err := us.userUC.Update(
 		ctx,
 		&params,
@@ -190,7 +188,7 @@ func (us *UserService) Delete(ctx context.Context, req *proto.DeleteRequest) (*p
 func (us *UserService) ValidateToken(ctx context.Context, req *proto.ValidateTokenRequest) (*proto.ValidateTokenResponse, error) {
 	resp, err := us.userUC.ValidToken(ctx, &user.ParamsValidToken{AccessToken: req.Token})
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
 
 	return &proto.ValidateTokenResponse{
@@ -203,7 +201,7 @@ func (us *UserService) GetStatsConns(ctx context.Context, req *proto.GetStatsCon
 
 	conns, err := us.userUC.GetConnsOnlineUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &proto.GetStatsConnsResponse{Conns: int64(conns)}, nil
