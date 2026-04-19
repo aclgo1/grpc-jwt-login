@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/aclgo/grpc-jwt/internal/models"
@@ -41,3 +42,10 @@ func FormatActiveSessionAccess(s string) string {
 func FormatActiveSessionRefresh(s string) string {
 	return fmt.Sprintf("active-refresh-session:%s", s)
 }
+
+var (
+	ErrPasswordIncorrect = errors.New("password incorrect")
+	ErrEmailCadastred    = errors.New("email cadastred")
+	ErrInvalidEmail      = errors.New("email invalid")
+	ErrPasswordSmall     = errors.New("password small lenght")
+)

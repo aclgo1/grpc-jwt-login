@@ -16,13 +16,6 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-var (
-	ErrPasswordIncorrect = errors.New("password incorrect")
-	ErrEmailCadastred    = errors.New("email cadastred")
-	ErrInvalidEmail      = errors.New("email invalid")
-	ErrPasswordSmall     = errors.New("password small lenght")
-)
-
 type userUC struct {
 	logger           logger.Logger
 	userRepoDatabase user.UserRepoDatabase
@@ -45,14 +38,14 @@ func NewUserUC(logger logger.Logger,
 
 func (u *userUC) Register(ctx context.Context, params *user.ParamsCreateUser) (*user.ParamsOutputUser, error) {
 	if !utils.ValidMail(params.Email) {
-		u.logger.Errorf("Register.FindByEmail: %v", ErrInvalidEmail)
-		return nil, fmt.Errorf("Register.FindByEmail: %v", ErrInvalidEmail)
+		u.logger.Errorf("!utils.ValidMail: %v", user.ErrInvalidEmail)
+		return nil, fmt.Errorf("!utils.ValidMail: %v", user.ErrInvalidEmail)
 	}
 
 	foundUser, _ := u.userRepoDatabase.FindByEmail(ctx, params.Email)
 	if foundUser != nil {
-		u.logger.Errorf("Register.FindByEmail: %v", ErrEmailCadastred)
-		return nil, fmt.Errorf("Register.FindByEmail: %v", ErrEmailCadastred)
+		u.logger.Errorf("u.userRepoDatabase.FindByEmail: %v", user.ErrEmailCadastred)
+		return nil, fmt.Errorf("Register.FindByEmail: %v", user.ErrEmailCadastred)
 	}
 
 	created, err := u.userRepoDatabase.Add(ctx, &models.User{
@@ -68,10 +61,11 @@ func (u *userUC) Register(ctx context.Context, params *user.ParamsCreateUser) (*
 	})
 
 	if err != nil {
-		u.logger.Errorf("Register.Add: %v", err)
+		u.logger.Errorf("u.userRepoDatabase.Add: %v", err)
 		return nil, fmt.Errorf("Register.Add: %v", err)
 	}
 
+	u.logger.Infof("Register: usuário criado com sucesso ID %s", created.UserID)
 	return user.Dto(created), nil
 }
 
@@ -84,8 +78,8 @@ func (u *userUC) Login(ctx context.Context, email string, password string) (*mod
 	}
 
 	if err := foundUser.ComparePass(password); err != nil {
-		u.logger.Errorf("Login: %v", ErrPasswordIncorrect)
-		return nil, ErrPasswordIncorrect
+		u.logger.Errorf("Login: %v", user.ErrPasswordIncorrect)
+		return nil, user.ErrPasswordIncorrect
 	}
 
 	if foundUser.Verified == user.DefaultVerifiedNo {
@@ -109,6 +103,8 @@ func (u *userUC) Login(ctx context.Context, email string, password string) (*mod
 
 	u.rc.Publish(ctx, "disconnect_channel", u.formatTokenDisconnectChannel(foundUser.UserID))
 
+	u.logger.Infof("Login: usuário %s autenticado com sucesso", email)
+
 	return &models.Tokens{
 		Access:  tokens.Access,
 		Refresh: tokens.Refresh,
@@ -120,6 +116,7 @@ func (u *userUC) Logout(ctx context.Context, in *user.ParamLogoutInput) error {
 	mc, err := u.jwtSession.ValidToken(ctx, in.AccessToken)
 	id, ok := mc["id"].(string)
 	if !ok {
+		u.logger.Errorf("Logout: falha ao obter ID dos claims")
 		return user.ErrInvalidTokenClaims{}
 	}
 
@@ -129,6 +126,7 @@ func (u *userUC) Logout(ctx context.Context, in *user.ParamLogoutInput) error {
 
 	_, err = pipe.Exec(ctx)
 	if err != nil {
+		u.logger.Errorf("Logout: erro ao remover sessão no Redis para %s: %v", id, err)
 		return fmt.Errorf("pipe.Exec: %w", err)
 	}
 
@@ -140,6 +138,8 @@ func (u *userUC) Logout(ctx context.Context, in *user.ParamLogoutInput) error {
 		return fmt.Errorf("Logout.RevogeToken: %v", err)
 	}
 
+	u.logger.Infof("Logout: usuário %s desconectado com sucesso", id)
+
 	return nil
 }
 
@@ -150,6 +150,8 @@ func (u *userUC) FindByID(ctx context.Context, userID string) (*user.ParamsOutpu
 		u.logger.Errorf("FindByID: %v", err)
 		return nil, fmt.Errorf("FindByID: %v", err)
 	}
+
+	u.logger.Infof("FindByID: usuário %s encontrado", userID)
 
 	return user.Dto(foundUser), nil
 }
@@ -172,7 +174,7 @@ func (u *userUC) FindByEmail(ctx context.Context, userEmail string) (*user.Param
 	// if err := u.userRepoCache.Set(ctx, foundUser); err != nil {
 	// 	u.logger.Warn("FindByEmail.Set: %v", err)
 	// }
-
+	u.logger.Infof("FindByEmail: usuário %s encontrado", foundUser.UserID)
 	return user.Dto(foundUser), nil
 	// }
 
@@ -204,11 +206,19 @@ func (u *userUC) Update(ctx context.Context, params *user.ParamsUpdateUser) (*us
 		return nil, errors.Wrap(err, "Update.Update")
 	}
 
+	u.logger.Infof("Update: usuário %s atualizado com sucesso", params.UserID)
 	return user.Dto(newUser), nil
 }
 
 func (u *userUC) Delete(ctx context.Context, params *user.ParamsDeleteUser) error {
-	return u.userRepoDatabase.Delete(ctx, params.UserID)
+	err := u.userRepoDatabase.Delete(ctx, params.UserID)
+	if err != nil {
+		u.logger.Errorf("Delete: erro ao deletar usuário %s: %v", params.UserID, err)
+		return err
+	}
+
+	u.logger.Infof("Delete: usuário %s deletado com sucesso", params.UserID)
+	return nil
 }
 
 func (u *userUC) ValidToken(ctx context.Context, params *user.ParamsValidToken) (*user.ParamsJwtData, error) {
@@ -220,20 +230,26 @@ func (u *userUC) ValidToken(ctx context.Context, params *user.ParamsValidToken) 
 
 	userID, ok := claims["id"].(string)
 	if !ok {
+		u.logger.Errorf("ValidToken: ID não encontrado nos claims")
 		return nil, user.ErrInvalidTokenClaims{}
 	}
 
 	activeSession, err := u.rc.Get(ctx, user.FormatActiveSessionAccess(userID)).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
+			u.logger.Warnf("ValidToken: sessão expirada no Redis para usuário %s", userID)
 			return nil, user.ErrSessionExpired{}
 		}
+		u.logger.Errorf("ValidToken: erro Redis para usuário %s: %v", userID, err)
 		return nil, err
 	}
 
 	if activeSession != params.AccessToken {
+		u.logger.Warnf("ValidToken: tentativa de uso de token antigo/substituído para usuário %s", userID)
 		return nil, user.ErrLoginNewDisp{}
 	}
+
+	u.logger.Infof("ValidToken: token validado para usuário %s", userID)
 
 	return &user.ParamsJwtData{
 		UserID: userID,
@@ -251,11 +267,13 @@ func (u *userUC) RefreshTokens(ctx context.Context, params *user.ParamsRefreshTo
 	userID, ok := mc["id"].(string)
 
 	if !ok {
+		u.logger.Errorf("RefreshTokens: ID ausente no refresh token")
 		return nil, errors.New("failed get user id for refresh token")
 	}
 
 	ractive, err := u.rc.Get(ctx, user.FormatActiveSessionRefresh(userID)).Result()
 	if err != nil {
+		u.logger.Errorf("RefreshTokens: erro ao buscar sessão ativa para %s: %v", userID, err)
 		if errors.Is(err, redis.Nil) {
 			return nil, user.ErrSessionExpired{}
 		}
@@ -263,11 +281,13 @@ func (u *userUC) RefreshTokens(ctx context.Context, params *user.ParamsRefreshTo
 	}
 
 	if ractive != params.RefreshToken {
+		u.logger.Warnf("RefreshTokens: refresh token não coincide com a sessão ativa para %s", userID)
 		return nil, user.ErrLoginNewDisp{}
 	}
 
 	tokens, err := u.jwtSession.RefreshToken(ctx, params.AccessToken, params.RefreshToken)
 	if err != nil {
+		u.logger.Errorf("RefreshTokens: falha ao gerar novos tokens para %s: %v", userID, err)
 		return nil, err
 	}
 
@@ -278,6 +298,7 @@ func (u *userUC) RefreshTokens(ctx context.Context, params *user.ParamsRefreshTo
 
 	_, err = pipe.Exec(ctx)
 	if err != nil {
+		u.logger.Errorf("RefreshTokens: erro ao atualizar Redis para %s: %v", userID, err)
 		return nil, fmt.Errorf("pipe.Exec: %w", err)
 	}
 
@@ -303,6 +324,7 @@ func (u *userUC) GetConnsOnlineUser(ctx context.Context) (int, error) {
 	}
 
 	if err := iter.Err(); err != nil {
+		u.logger.Errorf("iter.Err: %w", err)
 		return 0, fmt.Errorf("iter.Err: %w", err)
 	}
 

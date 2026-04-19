@@ -1,0 +1,9 @@
+{
+  "profile": "openai",
+  "env": {
+    "OPENAI_BASE_URL": "exit",
+    "OPENAI_MODEL": "google/gemma-4-31b-it:free",
+    "OPENAI_API_KEY": "e"
+  },
+  "createdAt": "2026-04-19T18:22:50.725Z"
+}
