@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/aclgo/grpc-jwt/internal/models"
 )
@@ -41,6 +42,11 @@ func FormatActiveSessionAccess(s string) string {
 
 func FormatActiveSessionRefresh(s string) string {
 	return fmt.Sprintf("active-refresh-session:%s", s)
+}
+
+func FormatTokenDisconnectChannel(userId string) string {
+	now := time.Now().UTC().Format(time.RFC3339)
+	return fmt.Sprintf("%s|%s", userId, now)
 }
 
 var (

@@ -101,7 +101,7 @@ func (u *userUC) Login(ctx context.Context, email string, password string) (*mod
 		return nil, fmt.Errorf("pipe.Exec: %w", err)
 	}
 
-	u.rc.Publish(ctx, "disconnect_channel", u.formatTokenDisconnectChannel(foundUser.UserID))
+	u.rc.Publish(ctx, "disconnect_channel", user.FormatTokenDisconnectChannel(foundUser.UserID))
 
 	u.logger.Infof("Login: usuário %s autenticado com sucesso", email)
 
@@ -130,7 +130,7 @@ func (u *userUC) Logout(ctx context.Context, in *user.ParamLogoutInput) error {
 		return fmt.Errorf("pipe.Exec: %w", err)
 	}
 
-	u.rc.Publish(ctx, "disconnect_channel", u.formatTokenDisconnectChannel(id))
+	u.rc.Publish(ctx, "disconnect_channel", user.FormatTokenDisconnectChannel(id))
 
 	err = u.jwtSession.RevogeToken(ctx, in.AccessToken, in.RefreshToken)
 	if err != nil {
@@ -329,9 +329,4 @@ func (u *userUC) GetConnsOnlineUser(ctx context.Context) (int, error) {
 	}
 
 	return count, nil
-}
-
-func (u *userUC) formatTokenDisconnectChannel(userId string) string {
-	now := time.Now().UTC().Format(time.RFC3339)
-	return fmt.Sprintf("%s|%s", userId, now)
 }
