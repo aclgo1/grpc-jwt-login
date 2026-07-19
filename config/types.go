@@ -16,5 +16,5 @@ type Config struct {
 	RedisPass                string        `mapstructure:"REDIS_PASS"`
 	TimeExpirateAccessToken  time.Duration `mapstructure:"TIME_EXPIRATE_ACCESS_TOKEN"`
 	TimeExpirateRefreshToken time.Duration `mapstructure:"TIME_EXPIRATE_REFRESH_TOKEN"`
-	PathPrivatePem           string        `mapstructure:"PATH_PRIVATE_PEM"`
+	PathPublicPem            string        `mapstructure:"PATH_PUBLIC_PEM"`
 }

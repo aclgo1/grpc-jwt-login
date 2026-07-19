@@ -23,7 +23,7 @@ type grpcAuth struct {
 func NewGrpcAuth(cfg *config.Config) *grpcAuth {
 	g := grpcAuth{}
 
-	pubKeyData, err := os.ReadFile(cfg.PathPrivatePem)
+	pubKeyData, err := os.ReadFile(cfg.PathPublicPem)
 	if err != nil {
 		log.Fatalf("NewGrpcAuth:os.ReadFile: %v", err)
 	}
