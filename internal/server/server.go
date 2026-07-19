@@ -46,7 +46,7 @@ func (s *Server) Run() error {
 
 	userService := service.NewUserService(s.logger, userUC)
 
-	auth := grpc_auth.NewGrpcAuth()
+	auth := grpc_auth.NewGrpcAuth(s.config)
 
 	listen, err := net.Listen("tcp", ":"+s.config.ServerPort)
 

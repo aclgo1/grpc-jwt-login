@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/aclgo/grpc-jwt/config"
 	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -19,10 +20,10 @@ type grpcAuth struct {
 	publicKey *rsa.PublicKey
 }
 
-func NewGrpcAuth() *grpcAuth {
+func NewGrpcAuth(cfg *config.Config) *grpcAuth {
 	g := grpcAuth{}
 
-	pubKeyData, err := os.ReadFile("certs/public_key.pem")
+	pubKeyData, err := os.ReadFile(cfg.PathPrivatePem)
 	if err != nil {
 		log.Fatalf("NewGrpcAuth:os.ReadFile: %v", err)
 	}
