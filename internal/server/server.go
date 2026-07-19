@@ -10,6 +10,7 @@ import (
 	"github.com/aclgo/grpc-jwt/internal/user/delivery/grpc/service"
 	userRepo "github.com/aclgo/grpc-jwt/internal/user/repository"
 	userUC "github.com/aclgo/grpc-jwt/internal/user/usecase"
+	"github.com/aclgo/grpc-jwt/pkg/grpc_auth"
 	"github.com/aclgo/grpc-jwt/pkg/logger"
 	"github.com/aclgo/grpc-jwt/proto"
 	"github.com/jmoiron/sqlx"
@@ -45,6 +46,8 @@ func (s *Server) Run() error {
 
 	userService := service.NewUserService(s.logger, userUC)
 
+	auth := grpc_auth.NewGrpcAuth()
+
 	listen, err := net.Listen("tcp", ":"+s.config.ServerPort)
 
 	if err != nil {
@@ -53,6 +56,7 @@ func (s *Server) Run() error {
 
 	opts := []grpc.ServerOption{
 		grpc.UnaryInterceptor(interceptor.Logger),
+		grpc.ChainUnaryInterceptor(auth.AuthInterceptor),
 	}
 
 	server := grpc.NewServer(opts...)
