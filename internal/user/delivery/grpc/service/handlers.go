@@ -101,6 +101,50 @@ func (us *UserService) RefreshTokens(ctx context.Context, req *proto.RefreshToke
 	return &out, nil
 }
 
+func (us *UserService) FindAll(ctx context.Context, req *proto.FindAllRequest) (*proto.FindAllResponse, error) {
+
+	p := user.Pagination{
+		Page:  int(req.Page),
+		Limit: int(req.Limit),
+	}
+
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
+
+	all, err := us.userUC.FindAll(ctx, &p)
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]*proto.User, len(all.Users))
+
+	for i := range all.Users {
+		user := all.Users[i]
+		out[i] = &proto.User{
+			Id:        user.Id,
+			Name:      user.Name,
+			LastName:  user.Lastname,
+			Password:  user.Password,
+			Email:     user.Email,
+			Role:      user.Role,
+			Verified:  user.Verified,
+			CreatedAt: timestamppb.New(user.CreatedAt),
+			UpdatedAt: timestamppb.New(user.UpdatedAt),
+		}
+	}
+
+	resp := proto.FindAllResponse{
+		Data:       out,
+		Page:       req.Page,
+		Limit:      req.Limit,
+		TotalItems: int32(all.TotalItems),
+		TotalPages: int32(all.TotalPages),
+	}
+
+	return &resp, nil
+}
+
 func (us *UserService) FindById(ctx context.Context, req *proto.FindByIdRequest) (*proto.FindByIdResponse, error) {
 	// tokenString, err := us.getToken(ctx, KeyAccessToken)
 	// if err != nil {

@@ -11,6 +11,14 @@ const (
 	queryFindByEmail = `select user_id, name, last_name, password, email, role, verified,
 	created_at,updated_at from users where email=$1`
 
+	queryFindAllPagination = `
+	SELECT user_id, name, last_name, password, email, role, verified, created_at, updated_at
+	FROM users
+	ORDER BY created_at DESC, user_id DESC
+	LIMIT $1 OFFSET $2;`
+
+	queryCountUsers = `SELECT COUNT(*) FROM users;`
+
 	queryUpdate = `UPDATE "users" SET 
     "name" = COALESCE(NULLIF($1, ''), "name"), 
     "last_name" = COALESCE(NULLIF($2, ''), "last_name"),

@@ -60,6 +60,10 @@ func (m *MockUserPGRepoRecorder) FindByID(ctx context.Context, userID any) *gomo
 	)
 }
 
+func (m *MockUserPGRepo) FindAll(ctx context.Context, pagination *models.Pagination) (*models.ParamsFindAllResponse, error) {
+	return nil, nil
+}
+
 func (m *MockUserPGRepo) FindByEmail(ctx context.Context, email string) (*models.User, error) {
 	m.ctrl.T.Helper()
 

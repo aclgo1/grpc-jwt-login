@@ -2,7 +2,9 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"math"
 
 	"github.com/aclgo/grpc-jwt/internal/models"
 	"github.com/jmoiron/sqlx"
@@ -46,6 +48,35 @@ func (p *postgresRepo) FindByID(ctx context.Context, userID string) (*models.Use
 	}
 	return &user, nil
 }
+
+func (p *postgresRepo) FindAll(ctx context.Context, pagination *models.Pagination) (*models.ParamsFindAllResponse, error) {
+	var totalItems int
+	err := p.db.GetContext(ctx, &totalItems, queryCountUsers)
+	if err != nil {
+		return nil, err
+	}
+
+	if totalItems == 0 {
+		return nil, errors.New("total items is 0")
+	}
+
+	pages := int(math.Ceil(float64(totalItems) / float64(pagination.Limit)))
+	var users []*models.User
+
+	err = p.db.SelectContext(ctx, &users, queryFindAllPagination, pagination.Limit, pagination.GetOffset())
+	if err != nil {
+		return nil, err
+	}
+
+	out := models.ParamsFindAllResponse{
+		Users:      users,
+		TotalItems: totalItems,
+		TotalPages: pages,
+	}
+
+	return &out, nil
+}
+
 func (p *postgresRepo) FindByEmail(ctx context.Context, userEmail string) (*models.User, error) {
 	user := models.User{}
 	err := p.db.GetContext(ctx, &user, queryFindByEmail, userEmail)

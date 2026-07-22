@@ -22,6 +22,7 @@ const (
 	UserService_Register_FullMethodName      = "/UserService/Register"
 	UserService_Login_FullMethodName         = "/UserService/Login"
 	UserService_Logout_FullMethodName        = "/UserService/Logout"
+	UserService_FindAll_FullMethodName       = "/UserService/FindAll"
 	UserService_FindById_FullMethodName      = "/UserService/FindById"
 	UserService_FindByEmail_FullMethodName   = "/UserService/FindByEmail"
 	UserService_Update_FullMethodName        = "/UserService/Update"
@@ -38,6 +39,7 @@ type UserServiceClient interface {
 	Register(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreatedUserResponse, error)
 	Login(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*UserLoginResponse, error)
 	Logout(ctx context.Context, in *UserLogoutRequest, opts ...grpc.CallOption) (*UserLogoutResponse, error)
+	FindAll(ctx context.Context, in *FindAllRequest, opts ...grpc.CallOption) (*FindAllResponse, error)
 	FindById(ctx context.Context, in *FindByIdRequest, opts ...grpc.CallOption) (*FindByIdResponse, error)
 	FindByEmail(ctx context.Context, in *FindByEmailRequest, opts ...grpc.CallOption) (*FindByEmailResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
@@ -79,6 +81,16 @@ func (c *userServiceClient) Logout(ctx context.Context, in *UserLogoutRequest, o
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserLogoutResponse)
 	err := c.cc.Invoke(ctx, UserService_Logout_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) FindAll(ctx context.Context, in *FindAllRequest, opts ...grpc.CallOption) (*FindAllResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FindAllResponse)
+	err := c.cc.Invoke(ctx, UserService_FindAll_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -162,6 +174,7 @@ type UserServiceServer interface {
 	Register(context.Context, *CreateUserRequest) (*CreatedUserResponse, error)
 	Login(context.Context, *UserLoginRequest) (*UserLoginResponse, error)
 	Logout(context.Context, *UserLogoutRequest) (*UserLogoutResponse, error)
+	FindAll(context.Context, *FindAllRequest) (*FindAllResponse, error)
 	FindById(context.Context, *FindByIdRequest) (*FindByIdResponse, error)
 	FindByEmail(context.Context, *FindByEmailRequest) (*FindByEmailResponse, error)
 	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
@@ -187,6 +200,9 @@ func (UnimplementedUserServiceServer) Login(context.Context, *UserLoginRequest) 
 }
 func (UnimplementedUserServiceServer) Logout(context.Context, *UserLogoutRequest) (*UserLogoutResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Logout not implemented")
+}
+func (UnimplementedUserServiceServer) FindAll(context.Context, *FindAllRequest) (*FindAllResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FindAll not implemented")
 }
 func (UnimplementedUserServiceServer) FindById(context.Context, *FindByIdRequest) (*FindByIdResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method FindById not implemented")
@@ -280,6 +296,24 @@ func _UserService_Logout_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).Logout(ctx, req.(*UserLogoutRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_FindAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindAllRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).FindAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_FindAll_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).FindAll(ctx, req.(*FindAllRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -428,6 +462,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Logout",
 			Handler:    _UserService_Logout_Handler,
+		},
+		{
+			MethodName: "FindAll",
+			Handler:    _UserService_FindAll_Handler,
 		},
 		{
 			MethodName: "FindById",

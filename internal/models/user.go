@@ -48,3 +48,18 @@ func (u *User) ComparePass(password string) error {
 type ParamsDeleteUser struct {
 	userID string
 }
+
+type Pagination struct {
+	Page  int
+	Limit int
+}
+
+func (p *Pagination) GetOffset() int {
+	return (p.Page - 1) * p.Limit
+}
+
+type ParamsFindAllResponse struct {
+	Users      []*User
+	TotalItems int
+	TotalPages int
+}

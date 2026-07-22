@@ -194,3 +194,32 @@ type ErrInvalidTokenClaims struct {
 func (e ErrInvalidTokenClaims) Error() string {
 	return "invalid token claims"
 }
+
+type Pagination struct {
+	Page  int
+	Limit int
+}
+
+func (p *Pagination) Validate() error {
+	if p.Page < 1 {
+		p.Page = 1
+	}
+
+	if p.Limit <= 0 {
+		p.Limit = 20
+	}
+
+	if p.Limit > 100 {
+		p.Limit = 100
+	}
+
+	return nil
+}
+
+type ParamsFindAllOutputUser struct {
+	Users      []*ParamsOutputUser
+	Page       int
+	Limit      int
+	TotalItems int
+	TotalPages int
+}

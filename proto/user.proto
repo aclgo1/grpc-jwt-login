@@ -50,6 +50,19 @@ message UserLogoutResponse{
 
 }
 
+message FindAllRequest {
+    int32 page = 1;
+    int32 limit = 2;
+}
+
+message FindAllResponse {
+    repeated User data = 1;
+    int32 page = 2;
+    int32 limit = 3;
+    int32 total_items = 4;
+    int32 total_pages = 5;
+}
+
 message FindByIdRequest {
     string id = 1;
 }
@@ -117,6 +130,7 @@ service UserService {
     rpc Register(CreateUserRequest) returns (CreatedUserResponse);
     rpc Login(UserLoginRequest)returns (UserLoginResponse);
     rpc Logout(UserLogoutRequest) returns (UserLogoutResponse);
+    rpc FindAll(FindAllRequest) returns (FindAllResponse);
     rpc FindById(FindByIdRequest) returns (FindByIdResponse);
     rpc FindByEmail(FindByEmailRequest) returns (FindByEmailResponse);
     rpc Update(UpdateRequest) returns (UpdateResponse);

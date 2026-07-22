@@ -13,6 +13,7 @@ type UserRepoDatabase interface {
 	Add(context.Context, *models.User) (*models.User, error)
 	FindByID(context.Context, string) (*models.User, error)
 	FindByEmail(context.Context, string) (*models.User, error)
+	FindAll(context.Context, *models.Pagination) (*models.ParamsFindAllResponse, error)
 	Update(context.Context, *models.User) (*models.User, error)
 	Delete(context.Context, string) error
 }
@@ -27,6 +28,7 @@ type UserUC interface {
 	Register(context.Context, *ParamsCreateUser) (*ParamsOutputUser, error)
 	FindByID(context.Context, string) (*ParamsOutputUser, error)
 	FindByEmail(context.Context, string) (*ParamsOutputUser, error)
+	FindAll(context.Context, *Pagination) (*ParamsFindAllOutputUser, error)
 	Update(context.Context, *ParamsUpdateUser) (*ParamsOutputUser, error)
 	Delete(context.Context, *ParamsDeleteUser) error
 	Login(context.Context, string, string) (*models.Tokens, error)

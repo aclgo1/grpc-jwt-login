@@ -143,6 +143,46 @@ func (u *userUC) Logout(ctx context.Context, in *user.ParamLogoutInput) error {
 	return nil
 }
 
+func (u *userUC) FindAll(ctx context.Context, pagination *user.Pagination) (*user.ParamsFindAllOutputUser, error) {
+
+	p := models.Pagination{
+		Page:  pagination.Page,
+		Limit: pagination.Limit,
+	}
+
+	all, err := u.userRepoDatabase.FindAll(ctx, &p)
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]*user.ParamsOutputUser, len(all.Users))
+
+	for i := range all.Users {
+		u := all.Users[i]
+		out[i] = &user.ParamsOutputUser{
+			Id:        u.UserID,
+			Name:      u.Name,
+			Lastname:  u.Lastname,
+			Password:  u.Password,
+			Email:     u.Email,
+			Role:      u.Role,
+			Verified:  u.Verified,
+			CreatedAt: u.CreatedAt,
+			UpdatedAt: u.UpdatedAt,
+		}
+	}
+
+	resp := user.ParamsFindAllOutputUser{
+		Users:      out,
+		Page:       pagination.Page,
+		Limit:      pagination.Limit,
+		TotalItems: all.TotalItems,
+		TotalPages: all.TotalPages,
+	}
+
+	return &resp, nil
+}
+
 func (u *userUC) FindByID(ctx context.Context, userID string) (*user.ParamsOutputUser, error) {
 
 	foundUser, err := u.userRepoDatabase.FindByID(ctx, userID)
