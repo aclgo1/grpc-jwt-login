@@ -23,6 +23,7 @@ type ParamsCreateUser struct {
 	Password string
 	Email    string
 	Role     string
+	Verified string
 }
 
 func (p *ParamsCreateUser) HashPass() string {
@@ -35,6 +36,12 @@ func (p *ParamsCreateUser) Validate(ctx context.Context) error {
 	case string(AdminRole):
 	default:
 		p.Role = string(ClientRole)
+	}
+
+	switch p.Verified {
+	case string(DefaultVerifiedYes):
+	default:
+		p.Verified = string(DefaultVerifiedNo)
 	}
 	return nil
 }

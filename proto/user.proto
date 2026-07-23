@@ -22,6 +22,7 @@ message CreateUserRequest {
     string password = 3;
     string email = 4;
     string role = 5;
+    string verified = 6;
 }
 
 message CreatedUserResponse {

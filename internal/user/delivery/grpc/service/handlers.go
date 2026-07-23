@@ -22,6 +22,7 @@ func (us *UserService) Register(ctx context.Context, req *proto.CreateUserReques
 		Password: req.Password,
 		Email:    req.Email,
 		Role:     req.Role,
+		Verified: req.Verified,
 	}
 
 	if err := params.Validate(ctx); err != nil {

@@ -137,6 +137,7 @@ type CreateUserRequest struct {
 	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
 	Email         string                 `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
 	Role          string                 `protobuf:"bytes,5,opt,name=role,proto3" json:"role,omitempty"`
+	Verified      string                 `protobuf:"bytes,6,opt,name=verified,proto3" json:"verified,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -202,6 +203,13 @@ func (x *CreateUserRequest) GetEmail() string {
 func (x *CreateUserRequest) GetRole() string {
 	if x != nil {
 		return x.Role
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetVerified() string {
+	if x != nil {
+		return x.Verified
 	}
 	return ""
 }
@@ -1295,13 +1303,14 @@ const file_user_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x8a\x01\n" +
+	"updated_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xa6\x01\n" +
 	"\x11CreateUserRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1b\n" +
 	"\tlast_name\x18\x02 \x01(\tR\blastName\x12\x1a\n" +
 	"\bpassword\x18\x03 \x01(\tR\bpassword\x12\x14\n" +
 	"\x05email\x18\x04 \x01(\tR\x05email\x12\x12\n" +
-	"\x04role\x18\x05 \x01(\tR\x04role\"0\n" +
+	"\x04role\x18\x05 \x01(\tR\x04role\x12\x1a\n" +
+	"\bverified\x18\x06 \x01(\tR\bverified\"0\n" +
 	"\x13CreatedUserResponse\x12\x19\n" +
 	"\x04user\x18\x01 \x01(\v2\x05.UserR\x04user\"D\n" +
 	"\x10UserLoginRequest\x12\x14\n" +
