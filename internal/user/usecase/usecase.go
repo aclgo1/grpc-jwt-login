@@ -257,6 +257,12 @@ func (u *userUC) Delete(ctx context.Context, params *user.ParamsDeleteUser) erro
 		return err
 	}
 
+	u.rc.Publish(ctx, "disconnect_channel", user.FormatTokenDisconnectChannel(params.UserID))
+
+	pipe := u.rc.Pipeline()
+	pipe.Del(ctx, user.FormatActiveSessionAccess(params.UserID))
+	pipe.Del(ctx, user.FormatActiveSessionRefresh(params.UserID))
+
 	u.logger.Infof("Delete: usuário %s deletado com sucesso", params.UserID)
 	return nil
 }
