@@ -21,6 +21,7 @@ message CreateUserRequest {
     string last_name = 2;
     string password = 3;
     string email = 4;
+    string role = 5;
 }
 
 message CreatedUserResponse {

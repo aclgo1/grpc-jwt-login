@@ -12,6 +12,7 @@ import (
 
 const (
 	ClientRole         = "client"
+	AdminRole          = "admin"
 	DefaultVerifiedNo  = "no"
 	DefaultVerifiedYes = "yes"
 )
@@ -21,6 +22,7 @@ type ParamsCreateUser struct {
 	Lastname string
 	Password string
 	Email    string
+	Role     string
 }
 
 func (p *ParamsCreateUser) HashPass() string {
@@ -29,6 +31,11 @@ func (p *ParamsCreateUser) HashPass() string {
 }
 
 func (p *ParamsCreateUser) Validate(ctx context.Context) error {
+	switch p.Role {
+	case string(AdminRole):
+	default:
+		p.Role = string(ClientRole)
+	}
 	return nil
 }
 
