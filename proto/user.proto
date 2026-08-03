@@ -128,6 +128,45 @@ message GetStatsConnsResponse{
     int64 conns = 1;
 }
 
+message CreateOrExtendSubscriptionRequest {
+  string id = 1;
+  string user_id = 2;
+  string plan = 3;
+  int64 days = 4;
+}
+
+message CreateOrExtendSubscriptionResponse {
+  string id = 1;
+  string user_id = 2;
+  string plan = 3;
+  string status = 4;
+  google.protobuf.Timestamp starts_at = 5;
+  google.protobuf.Timestamp expires_at = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+
+}
+
+message CheckIsPremiumRequest {
+  string user_id = 1;
+}
+
+message CheckIsPremiumResponse {
+  bool active = 1;
+  google.protobuf.Timestamp expires_at = 2;
+}
+
+message CancelSubscriptionRequest {
+  string user_id = 1;
+}
+
+message CancelSubscriptionResponse {
+  string subscription_id = 1;
+  string user_id = 2;
+  string status = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
 service UserService {
     rpc Register(CreateUserRequest) returns (CreatedUserResponse);
     rpc Login(UserLoginRequest)returns (UserLoginResponse);
@@ -141,5 +180,10 @@ service UserService {
     rpc RefreshTokens(RefreshTokensRequest) returns (RefreshTokensResponse);
     rpc GetStatsConns(GetStatsConnsRequest) returns (GetStatsConnsResponse);
 
+    rpc CreateOrExtend(CreateOrExtendSubscriptionRequest) returns (CreateOrExtendSubscriptionResponse);
+    rpc CancelSubscription(CancelSubscriptionRequest) returns (CancelSubscriptionResponse);
+    rpc CheckIsPremium(CheckIsPremiumRequest) returns (CheckIsPremiumResponse);
+
 }
+
 

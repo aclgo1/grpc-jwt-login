@@ -1286,6 +1286,382 @@ func (x *GetStatsConnsResponse) GetConns() int64 {
 	return 0
 }
 
+type CreateOrExtendSubscriptionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Plan          string                 `protobuf:"bytes,3,opt,name=plan,proto3" json:"plan,omitempty"`
+	Days          int64                  `protobuf:"varint,4,opt,name=days,proto3" json:"days,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateOrExtendSubscriptionRequest) Reset() {
+	*x = CreateOrExtendSubscriptionRequest{}
+	mi := &file_user_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateOrExtendSubscriptionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateOrExtendSubscriptionRequest) ProtoMessage() {}
+
+func (x *CreateOrExtendSubscriptionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateOrExtendSubscriptionRequest.ProtoReflect.Descriptor instead.
+func (*CreateOrExtendSubscriptionRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *CreateOrExtendSubscriptionRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *CreateOrExtendSubscriptionRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CreateOrExtendSubscriptionRequest) GetPlan() string {
+	if x != nil {
+		return x.Plan
+	}
+	return ""
+}
+
+func (x *CreateOrExtendSubscriptionRequest) GetDays() int64 {
+	if x != nil {
+		return x.Days
+	}
+	return 0
+}
+
+type CreateOrExtendSubscriptionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Plan          string                 `protobuf:"bytes,3,opt,name=plan,proto3" json:"plan,omitempty"`
+	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+	StartsAt      *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=starts_at,json=startsAt,proto3" json:"starts_at,omitempty"`
+	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateOrExtendSubscriptionResponse) Reset() {
+	*x = CreateOrExtendSubscriptionResponse{}
+	mi := &file_user_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateOrExtendSubscriptionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateOrExtendSubscriptionResponse) ProtoMessage() {}
+
+func (x *CreateOrExtendSubscriptionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateOrExtendSubscriptionResponse.ProtoReflect.Descriptor instead.
+func (*CreateOrExtendSubscriptionResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *CreateOrExtendSubscriptionResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *CreateOrExtendSubscriptionResponse) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CreateOrExtendSubscriptionResponse) GetPlan() string {
+	if x != nil {
+		return x.Plan
+	}
+	return ""
+}
+
+func (x *CreateOrExtendSubscriptionResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *CreateOrExtendSubscriptionResponse) GetStartsAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartsAt
+	}
+	return nil
+}
+
+func (x *CreateOrExtendSubscriptionResponse) GetExpiresAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return nil
+}
+
+func (x *CreateOrExtendSubscriptionResponse) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *CreateOrExtendSubscriptionResponse) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+type CheckIsPremiumRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckIsPremiumRequest) Reset() {
+	*x = CheckIsPremiumRequest{}
+	mi := &file_user_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckIsPremiumRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckIsPremiumRequest) ProtoMessage() {}
+
+func (x *CheckIsPremiumRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckIsPremiumRequest.ProtoReflect.Descriptor instead.
+func (*CheckIsPremiumRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *CheckIsPremiumRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type CheckIsPremiumResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Active        bool                   `protobuf:"varint,1,opt,name=active,proto3" json:"active,omitempty"`
+	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckIsPremiumResponse) Reset() {
+	*x = CheckIsPremiumResponse{}
+	mi := &file_user_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckIsPremiumResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckIsPremiumResponse) ProtoMessage() {}
+
+func (x *CheckIsPremiumResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckIsPremiumResponse.ProtoReflect.Descriptor instead.
+func (*CheckIsPremiumResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *CheckIsPremiumResponse) GetActive() bool {
+	if x != nil {
+		return x.Active
+	}
+	return false
+}
+
+func (x *CheckIsPremiumResponse) GetExpiresAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return nil
+}
+
+type CancelSubscriptionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CancelSubscriptionRequest) Reset() {
+	*x = CancelSubscriptionRequest{}
+	mi := &file_user_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CancelSubscriptionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CancelSubscriptionRequest) ProtoMessage() {}
+
+func (x *CancelSubscriptionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CancelSubscriptionRequest.ProtoReflect.Descriptor instead.
+func (*CancelSubscriptionRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *CancelSubscriptionRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type CancelSubscriptionResponse struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	SubscriptionId string                 `protobuf:"bytes,1,opt,name=subscription_id,json=subscriptionId,proto3" json:"subscription_id,omitempty"`
+	UserId         string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Status         string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	UpdatedAt      *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *CancelSubscriptionResponse) Reset() {
+	*x = CancelSubscriptionResponse{}
+	mi := &file_user_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CancelSubscriptionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CancelSubscriptionResponse) ProtoMessage() {}
+
+func (x *CancelSubscriptionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CancelSubscriptionResponse.ProtoReflect.Descriptor instead.
+func (*CancelSubscriptionResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *CancelSubscriptionResponse) GetSubscriptionId() string {
+	if x != nil {
+		return x.SubscriptionId
+	}
+	return ""
+}
+
+func (x *CancelSubscriptionResponse) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CancelSubscriptionResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *CancelSubscriptionResponse) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
 var File_user_proto protoreflect.FileDescriptor
 
 const file_user_proto_rawDesc = "" +
@@ -1369,7 +1745,38 @@ const file_user_proto_rawDesc = "" +
 	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\"\x16\n" +
 	"\x14GetStatsConnsRequest\"-\n" +
 	"\x15GetStatsConnsResponse\x12\x14\n" +
-	"\x05conns\x18\x01 \x01(\x03R\x05conns2\xd5\x04\n" +
+	"\x05conns\x18\x01 \x01(\x03R\x05conns\"t\n" +
+	"!CreateOrExtendSubscriptionRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04plan\x18\x03 \x01(\tR\x04plan\x12\x12\n" +
+	"\x04days\x18\x04 \x01(\x03R\x04days\"\xe3\x02\n" +
+	"\"CreateOrExtendSubscriptionResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04plan\x18\x03 \x01(\tR\x04plan\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\x127\n" +
+	"\tstarts_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\bstartsAt\x129\n" +
+	"\n" +
+	"expires_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x129\n" +
+	"\n" +
+	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"0\n" +
+	"\x15CheckIsPremiumRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"k\n" +
+	"\x16CheckIsPremiumResponse\x12\x16\n" +
+	"\x06active\x18\x01 \x01(\bR\x06active\x129\n" +
+	"\n" +
+	"expires_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"4\n" +
+	"\x19CancelSubscriptionRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"\xb1\x01\n" +
+	"\x1aCancelSubscriptionResponse\x12'\n" +
+	"\x0fsubscription_id\x18\x01 \x01(\tR\x0esubscriptionId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x16\n" +
+	"\x06status\x18\x03 \x01(\tR\x06status\x129\n" +
+	"\n" +
+	"updated_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt2\xc2\x06\n" +
 	"\vUserService\x124\n" +
 	"\bRegister\x12\x12.CreateUserRequest\x1a\x14.CreatedUserResponse\x12.\n" +
 	"\x05Login\x12\x11.UserLoginRequest\x1a\x12.UserLoginResponse\x121\n" +
@@ -1381,7 +1788,10 @@ const file_user_proto_rawDesc = "" +
 	"\x06Delete\x12\x0e.DeleteRequest\x1a\x0f.DeleteResponse\x12>\n" +
 	"\rValidateToken\x12\x15.ValidateTokenRequest\x1a\x16.ValidateTokenResponse\x12>\n" +
 	"\rRefreshTokens\x12\x15.RefreshTokensRequest\x1a\x16.RefreshTokensResponse\x12>\n" +
-	"\rGetStatsConns\x12\x15.GetStatsConnsRequest\x1a\x16.GetStatsConnsResponseB!Z\x1fgithub.com/aclgo/grpc-jwt/protob\x06proto3"
+	"\rGetStatsConns\x12\x15.GetStatsConnsRequest\x1a\x16.GetStatsConnsResponse\x12Y\n" +
+	"\x0eCreateOrExtend\x12\".CreateOrExtendSubscriptionRequest\x1a#.CreateOrExtendSubscriptionResponse\x12M\n" +
+	"\x12CancelSubscription\x12\x1a.CancelSubscriptionRequest\x1a\x1b.CancelSubscriptionResponse\x12A\n" +
+	"\x0eCheckIsPremium\x12\x16.CheckIsPremiumRequest\x1a\x17.CheckIsPremiumResponseB!Z\x1fgithub.com/aclgo/grpc-jwt/protob\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once
@@ -1395,70 +1805,88 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
 var file_user_proto_goTypes = []any{
-	(*User)(nil),                  // 0: User
-	(*CreateUserRequest)(nil),     // 1: CreateUserRequest
-	(*CreatedUserResponse)(nil),   // 2: CreatedUserResponse
-	(*UserLoginRequest)(nil),      // 3: UserLoginRequest
-	(*Tokens)(nil),                // 4: Tokens
-	(*UserLoginResponse)(nil),     // 5: UserLoginResponse
-	(*UserLogoutRequest)(nil),     // 6: UserLogoutRequest
-	(*UserLogoutResponse)(nil),    // 7: UserLogoutResponse
-	(*FindAllRequest)(nil),        // 8: FindAllRequest
-	(*FindAllResponse)(nil),       // 9: FindAllResponse
-	(*FindByIdRequest)(nil),       // 10: FindByIdRequest
-	(*FindByIdResponse)(nil),      // 11: FindByIdResponse
-	(*FindByEmailRequest)(nil),    // 12: FindByEmailRequest
-	(*FindByEmailResponse)(nil),   // 13: FindByEmailResponse
-	(*UpdateRequest)(nil),         // 14: UpdateRequest
-	(*UpdateResponse)(nil),        // 15: UpdateResponse
-	(*DeleteRequest)(nil),         // 16: DeleteRequest
-	(*DeleteResponse)(nil),        // 17: DeleteResponse
-	(*ValidateTokenRequest)(nil),  // 18: ValidateTokenRequest
-	(*ValidateTokenResponse)(nil), // 19: ValidateTokenResponse
-	(*RefreshTokensRequest)(nil),  // 20: RefreshTokensRequest
-	(*RefreshTokensResponse)(nil), // 21: RefreshTokensResponse
-	(*GetStatsConnsRequest)(nil),  // 22: GetStatsConnsRequest
-	(*GetStatsConnsResponse)(nil), // 23: GetStatsConnsResponse
-	(*timestamppb.Timestamp)(nil), // 24: google.protobuf.Timestamp
+	(*User)(nil),                               // 0: User
+	(*CreateUserRequest)(nil),                  // 1: CreateUserRequest
+	(*CreatedUserResponse)(nil),                // 2: CreatedUserResponse
+	(*UserLoginRequest)(nil),                   // 3: UserLoginRequest
+	(*Tokens)(nil),                             // 4: Tokens
+	(*UserLoginResponse)(nil),                  // 5: UserLoginResponse
+	(*UserLogoutRequest)(nil),                  // 6: UserLogoutRequest
+	(*UserLogoutResponse)(nil),                 // 7: UserLogoutResponse
+	(*FindAllRequest)(nil),                     // 8: FindAllRequest
+	(*FindAllResponse)(nil),                    // 9: FindAllResponse
+	(*FindByIdRequest)(nil),                    // 10: FindByIdRequest
+	(*FindByIdResponse)(nil),                   // 11: FindByIdResponse
+	(*FindByEmailRequest)(nil),                 // 12: FindByEmailRequest
+	(*FindByEmailResponse)(nil),                // 13: FindByEmailResponse
+	(*UpdateRequest)(nil),                      // 14: UpdateRequest
+	(*UpdateResponse)(nil),                     // 15: UpdateResponse
+	(*DeleteRequest)(nil),                      // 16: DeleteRequest
+	(*DeleteResponse)(nil),                     // 17: DeleteResponse
+	(*ValidateTokenRequest)(nil),               // 18: ValidateTokenRequest
+	(*ValidateTokenResponse)(nil),              // 19: ValidateTokenResponse
+	(*RefreshTokensRequest)(nil),               // 20: RefreshTokensRequest
+	(*RefreshTokensResponse)(nil),              // 21: RefreshTokensResponse
+	(*GetStatsConnsRequest)(nil),               // 22: GetStatsConnsRequest
+	(*GetStatsConnsResponse)(nil),              // 23: GetStatsConnsResponse
+	(*CreateOrExtendSubscriptionRequest)(nil),  // 24: CreateOrExtendSubscriptionRequest
+	(*CreateOrExtendSubscriptionResponse)(nil), // 25: CreateOrExtendSubscriptionResponse
+	(*CheckIsPremiumRequest)(nil),              // 26: CheckIsPremiumRequest
+	(*CheckIsPremiumResponse)(nil),             // 27: CheckIsPremiumResponse
+	(*CancelSubscriptionRequest)(nil),          // 28: CancelSubscriptionRequest
+	(*CancelSubscriptionResponse)(nil),         // 29: CancelSubscriptionResponse
+	(*timestamppb.Timestamp)(nil),              // 30: google.protobuf.Timestamp
 }
 var file_user_proto_depIdxs = []int32{
-	24, // 0: User.created_at:type_name -> google.protobuf.Timestamp
-	24, // 1: User.updated_at:type_name -> google.protobuf.Timestamp
+	30, // 0: User.created_at:type_name -> google.protobuf.Timestamp
+	30, // 1: User.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 2: CreatedUserResponse.user:type_name -> User
 	4,  // 3: UserLoginResponse.tokens:type_name -> Tokens
 	0,  // 4: FindAllResponse.data:type_name -> User
 	0,  // 5: FindByIdResponse.user:type_name -> User
 	0,  // 6: FindByEmailResponse.user:type_name -> User
 	0,  // 7: UpdateResponse.user:type_name -> User
-	1,  // 8: UserService.Register:input_type -> CreateUserRequest
-	3,  // 9: UserService.Login:input_type -> UserLoginRequest
-	6,  // 10: UserService.Logout:input_type -> UserLogoutRequest
-	8,  // 11: UserService.FindAll:input_type -> FindAllRequest
-	10, // 12: UserService.FindById:input_type -> FindByIdRequest
-	12, // 13: UserService.FindByEmail:input_type -> FindByEmailRequest
-	14, // 14: UserService.Update:input_type -> UpdateRequest
-	16, // 15: UserService.Delete:input_type -> DeleteRequest
-	18, // 16: UserService.ValidateToken:input_type -> ValidateTokenRequest
-	20, // 17: UserService.RefreshTokens:input_type -> RefreshTokensRequest
-	22, // 18: UserService.GetStatsConns:input_type -> GetStatsConnsRequest
-	2,  // 19: UserService.Register:output_type -> CreatedUserResponse
-	5,  // 20: UserService.Login:output_type -> UserLoginResponse
-	7,  // 21: UserService.Logout:output_type -> UserLogoutResponse
-	9,  // 22: UserService.FindAll:output_type -> FindAllResponse
-	11, // 23: UserService.FindById:output_type -> FindByIdResponse
-	13, // 24: UserService.FindByEmail:output_type -> FindByEmailResponse
-	15, // 25: UserService.Update:output_type -> UpdateResponse
-	17, // 26: UserService.Delete:output_type -> DeleteResponse
-	19, // 27: UserService.ValidateToken:output_type -> ValidateTokenResponse
-	21, // 28: UserService.RefreshTokens:output_type -> RefreshTokensResponse
-	23, // 29: UserService.GetStatsConns:output_type -> GetStatsConnsResponse
-	19, // [19:30] is the sub-list for method output_type
-	8,  // [8:19] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	30, // 8: CreateOrExtendSubscriptionResponse.starts_at:type_name -> google.protobuf.Timestamp
+	30, // 9: CreateOrExtendSubscriptionResponse.expires_at:type_name -> google.protobuf.Timestamp
+	30, // 10: CreateOrExtendSubscriptionResponse.created_at:type_name -> google.protobuf.Timestamp
+	30, // 11: CreateOrExtendSubscriptionResponse.updated_at:type_name -> google.protobuf.Timestamp
+	30, // 12: CheckIsPremiumResponse.expires_at:type_name -> google.protobuf.Timestamp
+	30, // 13: CancelSubscriptionResponse.updated_at:type_name -> google.protobuf.Timestamp
+	1,  // 14: UserService.Register:input_type -> CreateUserRequest
+	3,  // 15: UserService.Login:input_type -> UserLoginRequest
+	6,  // 16: UserService.Logout:input_type -> UserLogoutRequest
+	8,  // 17: UserService.FindAll:input_type -> FindAllRequest
+	10, // 18: UserService.FindById:input_type -> FindByIdRequest
+	12, // 19: UserService.FindByEmail:input_type -> FindByEmailRequest
+	14, // 20: UserService.Update:input_type -> UpdateRequest
+	16, // 21: UserService.Delete:input_type -> DeleteRequest
+	18, // 22: UserService.ValidateToken:input_type -> ValidateTokenRequest
+	20, // 23: UserService.RefreshTokens:input_type -> RefreshTokensRequest
+	22, // 24: UserService.GetStatsConns:input_type -> GetStatsConnsRequest
+	24, // 25: UserService.CreateOrExtend:input_type -> CreateOrExtendSubscriptionRequest
+	28, // 26: UserService.CancelSubscription:input_type -> CancelSubscriptionRequest
+	26, // 27: UserService.CheckIsPremium:input_type -> CheckIsPremiumRequest
+	2,  // 28: UserService.Register:output_type -> CreatedUserResponse
+	5,  // 29: UserService.Login:output_type -> UserLoginResponse
+	7,  // 30: UserService.Logout:output_type -> UserLogoutResponse
+	9,  // 31: UserService.FindAll:output_type -> FindAllResponse
+	11, // 32: UserService.FindById:output_type -> FindByIdResponse
+	13, // 33: UserService.FindByEmail:output_type -> FindByEmailResponse
+	15, // 34: UserService.Update:output_type -> UpdateResponse
+	17, // 35: UserService.Delete:output_type -> DeleteResponse
+	19, // 36: UserService.ValidateToken:output_type -> ValidateTokenResponse
+	21, // 37: UserService.RefreshTokens:output_type -> RefreshTokensResponse
+	23, // 38: UserService.GetStatsConns:output_type -> GetStatsConnsResponse
+	25, // 39: UserService.CreateOrExtend:output_type -> CreateOrExtendSubscriptionResponse
+	29, // 40: UserService.CancelSubscription:output_type -> CancelSubscriptionResponse
+	27, // 41: UserService.CheckIsPremium:output_type -> CheckIsPremiumResponse
+	28, // [28:42] is the sub-list for method output_type
+	14, // [14:28] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_user_proto_init() }
@@ -1472,7 +1900,7 @@ func file_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   24,
+			NumMessages:   30,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
