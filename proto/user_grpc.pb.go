@@ -19,20 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_Register_FullMethodName           = "/UserService/Register"
-	UserService_Login_FullMethodName              = "/UserService/Login"
-	UserService_Logout_FullMethodName             = "/UserService/Logout"
-	UserService_FindAll_FullMethodName            = "/UserService/FindAll"
-	UserService_FindById_FullMethodName           = "/UserService/FindById"
-	UserService_FindByEmail_FullMethodName        = "/UserService/FindByEmail"
-	UserService_Update_FullMethodName             = "/UserService/Update"
-	UserService_Delete_FullMethodName             = "/UserService/Delete"
-	UserService_ValidateToken_FullMethodName      = "/UserService/ValidateToken"
-	UserService_RefreshTokens_FullMethodName      = "/UserService/RefreshTokens"
-	UserService_GetStatsConns_FullMethodName      = "/UserService/GetStatsConns"
-	UserService_CreateOrExtend_FullMethodName     = "/UserService/CreateOrExtend"
-	UserService_CancelSubscription_FullMethodName = "/UserService/CancelSubscription"
-	UserService_CheckIsPremium_FullMethodName     = "/UserService/CheckIsPremium"
+	UserService_Register_FullMethodName      = "/UserService/Register"
+	UserService_Login_FullMethodName         = "/UserService/Login"
+	UserService_Logout_FullMethodName        = "/UserService/Logout"
+	UserService_FindAll_FullMethodName       = "/UserService/FindAll"
+	UserService_FindById_FullMethodName      = "/UserService/FindById"
+	UserService_FindByEmail_FullMethodName   = "/UserService/FindByEmail"
+	UserService_Update_FullMethodName        = "/UserService/Update"
+	UserService_Delete_FullMethodName        = "/UserService/Delete"
+	UserService_ValidateToken_FullMethodName = "/UserService/ValidateToken"
+	UserService_RefreshTokens_FullMethodName = "/UserService/RefreshTokens"
+	UserService_GetStatsConns_FullMethodName = "/UserService/GetStatsConns"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -50,9 +47,6 @@ type UserServiceClient interface {
 	ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error)
 	RefreshTokens(ctx context.Context, in *RefreshTokensRequest, opts ...grpc.CallOption) (*RefreshTokensResponse, error)
 	GetStatsConns(ctx context.Context, in *GetStatsConnsRequest, opts ...grpc.CallOption) (*GetStatsConnsResponse, error)
-	CreateOrExtend(ctx context.Context, in *CreateOrExtendSubscriptionRequest, opts ...grpc.CallOption) (*CreateOrExtendSubscriptionResponse, error)
-	CancelSubscription(ctx context.Context, in *CancelSubscriptionRequest, opts ...grpc.CallOption) (*CancelSubscriptionResponse, error)
-	CheckIsPremium(ctx context.Context, in *CheckIsPremiumRequest, opts ...grpc.CallOption) (*CheckIsPremiumResponse, error)
 }
 
 type userServiceClient struct {
@@ -173,36 +167,6 @@ func (c *userServiceClient) GetStatsConns(ctx context.Context, in *GetStatsConns
 	return out, nil
 }
 
-func (c *userServiceClient) CreateOrExtend(ctx context.Context, in *CreateOrExtendSubscriptionRequest, opts ...grpc.CallOption) (*CreateOrExtendSubscriptionResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateOrExtendSubscriptionResponse)
-	err := c.cc.Invoke(ctx, UserService_CreateOrExtend_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) CancelSubscription(ctx context.Context, in *CancelSubscriptionRequest, opts ...grpc.CallOption) (*CancelSubscriptionResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CancelSubscriptionResponse)
-	err := c.cc.Invoke(ctx, UserService_CancelSubscription_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) CheckIsPremium(ctx context.Context, in *CheckIsPremiumRequest, opts ...grpc.CallOption) (*CheckIsPremiumResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CheckIsPremiumResponse)
-	err := c.cc.Invoke(ctx, UserService_CheckIsPremium_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -218,9 +182,6 @@ type UserServiceServer interface {
 	ValidateToken(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error)
 	RefreshTokens(context.Context, *RefreshTokensRequest) (*RefreshTokensResponse, error)
 	GetStatsConns(context.Context, *GetStatsConnsRequest) (*GetStatsConnsResponse, error)
-	CreateOrExtend(context.Context, *CreateOrExtendSubscriptionRequest) (*CreateOrExtendSubscriptionResponse, error)
-	CancelSubscription(context.Context, *CancelSubscriptionRequest) (*CancelSubscriptionResponse, error)
-	CheckIsPremium(context.Context, *CheckIsPremiumRequest) (*CheckIsPremiumResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -263,15 +224,6 @@ func (UnimplementedUserServiceServer) RefreshTokens(context.Context, *RefreshTok
 }
 func (UnimplementedUserServiceServer) GetStatsConns(context.Context, *GetStatsConnsRequest) (*GetStatsConnsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetStatsConns not implemented")
-}
-func (UnimplementedUserServiceServer) CreateOrExtend(context.Context, *CreateOrExtendSubscriptionRequest) (*CreateOrExtendSubscriptionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateOrExtend not implemented")
-}
-func (UnimplementedUserServiceServer) CancelSubscription(context.Context, *CancelSubscriptionRequest) (*CancelSubscriptionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CancelSubscription not implemented")
-}
-func (UnimplementedUserServiceServer) CheckIsPremium(context.Context, *CheckIsPremiumRequest) (*CheckIsPremiumResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CheckIsPremium not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -492,60 +444,6 @@ func _UserService_GetStatsConns_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_CreateOrExtend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateOrExtendSubscriptionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).CreateOrExtend(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UserService_CreateOrExtend_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).CreateOrExtend(ctx, req.(*CreateOrExtendSubscriptionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_CancelSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CancelSubscriptionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).CancelSubscription(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UserService_CancelSubscription_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).CancelSubscription(ctx, req.(*CancelSubscriptionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_CheckIsPremium_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CheckIsPremiumRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).CheckIsPremium(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UserService_CheckIsPremium_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).CheckIsPremium(ctx, req.(*CheckIsPremiumRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -597,17 +495,183 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetStatsConns",
 			Handler:    _UserService_GetStatsConns_Handler,
 		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "user.proto",
+}
+
+const (
+	SubscriptionService_CreateOrExtend_FullMethodName     = "/SubscriptionService/CreateOrExtend"
+	SubscriptionService_CancelSubscription_FullMethodName = "/SubscriptionService/CancelSubscription"
+	SubscriptionService_CheckIsPremium_FullMethodName     = "/SubscriptionService/CheckIsPremium"
+)
+
+// SubscriptionServiceClient is the client API for SubscriptionService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type SubscriptionServiceClient interface {
+	CreateOrExtend(ctx context.Context, in *CreateOrExtendSubscriptionRequest, opts ...grpc.CallOption) (*CreateOrExtendSubscriptionResponse, error)
+	CancelSubscription(ctx context.Context, in *CancelSubscriptionRequest, opts ...grpc.CallOption) (*CancelSubscriptionResponse, error)
+	CheckIsPremium(ctx context.Context, in *CheckIsPremiumRequest, opts ...grpc.CallOption) (*CheckIsPremiumResponse, error)
+}
+
+type subscriptionServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewSubscriptionServiceClient(cc grpc.ClientConnInterface) SubscriptionServiceClient {
+	return &subscriptionServiceClient{cc}
+}
+
+func (c *subscriptionServiceClient) CreateOrExtend(ctx context.Context, in *CreateOrExtendSubscriptionRequest, opts ...grpc.CallOption) (*CreateOrExtendSubscriptionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateOrExtendSubscriptionResponse)
+	err := c.cc.Invoke(ctx, SubscriptionService_CreateOrExtend_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *subscriptionServiceClient) CancelSubscription(ctx context.Context, in *CancelSubscriptionRequest, opts ...grpc.CallOption) (*CancelSubscriptionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CancelSubscriptionResponse)
+	err := c.cc.Invoke(ctx, SubscriptionService_CancelSubscription_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *subscriptionServiceClient) CheckIsPremium(ctx context.Context, in *CheckIsPremiumRequest, opts ...grpc.CallOption) (*CheckIsPremiumResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckIsPremiumResponse)
+	err := c.cc.Invoke(ctx, SubscriptionService_CheckIsPremium_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// SubscriptionServiceServer is the server API for SubscriptionService service.
+// All implementations must embed UnimplementedSubscriptionServiceServer
+// for forward compatibility.
+type SubscriptionServiceServer interface {
+	CreateOrExtend(context.Context, *CreateOrExtendSubscriptionRequest) (*CreateOrExtendSubscriptionResponse, error)
+	CancelSubscription(context.Context, *CancelSubscriptionRequest) (*CancelSubscriptionResponse, error)
+	CheckIsPremium(context.Context, *CheckIsPremiumRequest) (*CheckIsPremiumResponse, error)
+	mustEmbedUnimplementedSubscriptionServiceServer()
+}
+
+// UnimplementedSubscriptionServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedSubscriptionServiceServer struct{}
+
+func (UnimplementedSubscriptionServiceServer) CreateOrExtend(context.Context, *CreateOrExtendSubscriptionRequest) (*CreateOrExtendSubscriptionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateOrExtend not implemented")
+}
+func (UnimplementedSubscriptionServiceServer) CancelSubscription(context.Context, *CancelSubscriptionRequest) (*CancelSubscriptionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CancelSubscription not implemented")
+}
+func (UnimplementedSubscriptionServiceServer) CheckIsPremium(context.Context, *CheckIsPremiumRequest) (*CheckIsPremiumResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CheckIsPremium not implemented")
+}
+func (UnimplementedSubscriptionServiceServer) mustEmbedUnimplementedSubscriptionServiceServer() {}
+func (UnimplementedSubscriptionServiceServer) testEmbeddedByValue()                             {}
+
+// UnsafeSubscriptionServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to SubscriptionServiceServer will
+// result in compilation errors.
+type UnsafeSubscriptionServiceServer interface {
+	mustEmbedUnimplementedSubscriptionServiceServer()
+}
+
+func RegisterSubscriptionServiceServer(s grpc.ServiceRegistrar, srv SubscriptionServiceServer) {
+	// If the following call panics, it indicates UnimplementedSubscriptionServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&SubscriptionService_ServiceDesc, srv)
+}
+
+func _SubscriptionService_CreateOrExtend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateOrExtendSubscriptionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SubscriptionServiceServer).CreateOrExtend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SubscriptionService_CreateOrExtend_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SubscriptionServiceServer).CreateOrExtend(ctx, req.(*CreateOrExtendSubscriptionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SubscriptionService_CancelSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelSubscriptionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SubscriptionServiceServer).CancelSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SubscriptionService_CancelSubscription_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SubscriptionServiceServer).CancelSubscription(ctx, req.(*CancelSubscriptionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SubscriptionService_CheckIsPremium_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckIsPremiumRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SubscriptionServiceServer).CheckIsPremium(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SubscriptionService_CheckIsPremium_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SubscriptionServiceServer).CheckIsPremium(ctx, req.(*CheckIsPremiumRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// SubscriptionService_ServiceDesc is the grpc.ServiceDesc for SubscriptionService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var SubscriptionService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "SubscriptionService",
+	HandlerType: (*SubscriptionServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CreateOrExtend",
-			Handler:    _UserService_CreateOrExtend_Handler,
+			Handler:    _SubscriptionService_CreateOrExtend_Handler,
 		},
 		{
 			MethodName: "CancelSubscription",
-			Handler:    _UserService_CancelSubscription_Handler,
+			Handler:    _SubscriptionService_CancelSubscription_Handler,
 		},
 		{
 			MethodName: "CheckIsPremium",
-			Handler:    _UserService_CheckIsPremium_Handler,
+			Handler:    _SubscriptionService_CheckIsPremium_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

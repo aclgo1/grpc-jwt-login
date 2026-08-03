@@ -1776,7 +1776,7 @@ const file_user_proto_rawDesc = "" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x16\n" +
 	"\x06status\x18\x03 \x01(\tR\x06status\x129\n" +
 	"\n" +
-	"updated_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt2\xc2\x06\n" +
+	"updated_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt2\xd5\x04\n" +
 	"\vUserService\x124\n" +
 	"\bRegister\x12\x12.CreateUserRequest\x1a\x14.CreatedUserResponse\x12.\n" +
 	"\x05Login\x12\x11.UserLoginRequest\x1a\x12.UserLoginResponse\x121\n" +
@@ -1788,7 +1788,8 @@ const file_user_proto_rawDesc = "" +
 	"\x06Delete\x12\x0e.DeleteRequest\x1a\x0f.DeleteResponse\x12>\n" +
 	"\rValidateToken\x12\x15.ValidateTokenRequest\x1a\x16.ValidateTokenResponse\x12>\n" +
 	"\rRefreshTokens\x12\x15.RefreshTokensRequest\x1a\x16.RefreshTokensResponse\x12>\n" +
-	"\rGetStatsConns\x12\x15.GetStatsConnsRequest\x1a\x16.GetStatsConnsResponse\x12Y\n" +
+	"\rGetStatsConns\x12\x15.GetStatsConnsRequest\x1a\x16.GetStatsConnsResponse2\x82\x02\n" +
+	"\x13SubscriptionService\x12Y\n" +
 	"\x0eCreateOrExtend\x12\".CreateOrExtendSubscriptionRequest\x1a#.CreateOrExtendSubscriptionResponse\x12M\n" +
 	"\x12CancelSubscription\x12\x1a.CancelSubscriptionRequest\x1a\x1b.CancelSubscriptionResponse\x12A\n" +
 	"\x0eCheckIsPremium\x12\x16.CheckIsPremiumRequest\x1a\x17.CheckIsPremiumResponseB!Z\x1fgithub.com/aclgo/grpc-jwt/protob\x06proto3"
@@ -1865,9 +1866,9 @@ var file_user_proto_depIdxs = []int32{
 	18, // 22: UserService.ValidateToken:input_type -> ValidateTokenRequest
 	20, // 23: UserService.RefreshTokens:input_type -> RefreshTokensRequest
 	22, // 24: UserService.GetStatsConns:input_type -> GetStatsConnsRequest
-	24, // 25: UserService.CreateOrExtend:input_type -> CreateOrExtendSubscriptionRequest
-	28, // 26: UserService.CancelSubscription:input_type -> CancelSubscriptionRequest
-	26, // 27: UserService.CheckIsPremium:input_type -> CheckIsPremiumRequest
+	24, // 25: SubscriptionService.CreateOrExtend:input_type -> CreateOrExtendSubscriptionRequest
+	28, // 26: SubscriptionService.CancelSubscription:input_type -> CancelSubscriptionRequest
+	26, // 27: SubscriptionService.CheckIsPremium:input_type -> CheckIsPremiumRequest
 	2,  // 28: UserService.Register:output_type -> CreatedUserResponse
 	5,  // 29: UserService.Login:output_type -> UserLoginResponse
 	7,  // 30: UserService.Logout:output_type -> UserLogoutResponse
@@ -1879,9 +1880,9 @@ var file_user_proto_depIdxs = []int32{
 	19, // 36: UserService.ValidateToken:output_type -> ValidateTokenResponse
 	21, // 37: UserService.RefreshTokens:output_type -> RefreshTokensResponse
 	23, // 38: UserService.GetStatsConns:output_type -> GetStatsConnsResponse
-	25, // 39: UserService.CreateOrExtend:output_type -> CreateOrExtendSubscriptionResponse
-	29, // 40: UserService.CancelSubscription:output_type -> CancelSubscriptionResponse
-	27, // 41: UserService.CheckIsPremium:output_type -> CheckIsPremiumResponse
+	25, // 39: SubscriptionService.CreateOrExtend:output_type -> CreateOrExtendSubscriptionResponse
+	29, // 40: SubscriptionService.CancelSubscription:output_type -> CancelSubscriptionResponse
+	27, // 41: SubscriptionService.CheckIsPremium:output_type -> CheckIsPremiumResponse
 	28, // [28:42] is the sub-list for method output_type
 	14, // [14:28] is the sub-list for method input_type
 	14, // [14:14] is the sub-list for extension type_name
@@ -1902,7 +1903,7 @@ func file_user_proto_init() {
 			NumEnums:      0,
 			NumMessages:   30,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_user_proto_goTypes,
 		DependencyIndexes: file_user_proto_depIdxs,

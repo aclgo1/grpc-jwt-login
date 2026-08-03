@@ -1,12 +1,17 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/aclgo/grpc-jwt/config"
 	"github.com/aclgo/grpc-jwt/internal/interceptor"
 	sessionUC "github.com/aclgo/grpc-jwt/internal/session/usecase"
+	subscriptionService "github.com/aclgo/grpc-jwt/internal/subscription/delivery/grpc/service"
+	subscriptionRepo "github.com/aclgo/grpc-jwt/internal/subscription/repository"
+	subscriptionUC "github.com/aclgo/grpc-jwt/internal/subscription/usecase"
 	"github.com/aclgo/grpc-jwt/internal/user/delivery/grpc/service"
 	userRepo "github.com/aclgo/grpc-jwt/internal/user/repository"
 	userUC "github.com/aclgo/grpc-jwt/internal/user/usecase"
@@ -43,8 +48,13 @@ func (s *Server) Run() error {
 	usRepo := userRepo.NewPostgresRepo(s.db)
 	usRepoRedis := userRepo.NewredisRepo(s.redisClient)
 	userUC := userUC.NewUserUC(s.logger, usRepo, usRepoRedis, sessUC, s.redisClient)
+	
+	subRepo := subscriptionRepo.NewSubscriptionRepo(s.db)
+	subUC := subscriptionUC.NewSubscriptionUseCase(context.Background(), 500, time.Hour*12, subRepo)
+
 
 	userService := service.NewUserService(s.logger, userUC)
+	subService := subscriptionService.NewSubscriptionService(subUC)
 
 	auth := grpc_auth.NewGrpcAuth(s.config)
 
@@ -61,6 +71,7 @@ func (s *Server) Run() error {
 
 	server := grpc.NewServer(opts...)
 	proto.RegisterUserServiceServer(server, userService)
+	proto.RegisterSubscriptionServiceServer(server,subService)
 	s.logger.Infof("server starting port %s", s.config.ServerPort)
 	if err := server.Serve(listen); err != nil {
 		return fmt.Errorf("Run.NewServer: %v", err)

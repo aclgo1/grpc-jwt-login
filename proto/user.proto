@@ -179,11 +179,12 @@ service UserService {
     rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
     rpc RefreshTokens(RefreshTokensRequest) returns (RefreshTokensResponse);
     rpc GetStatsConns(GetStatsConnsRequest) returns (GetStatsConnsResponse);
+}
 
+service SubscriptionService{
     rpc CreateOrExtend(CreateOrExtendSubscriptionRequest) returns (CreateOrExtendSubscriptionResponse);
     rpc CancelSubscription(CancelSubscriptionRequest) returns (CancelSubscriptionResponse);
     rpc CheckIsPremium(CheckIsPremiumRequest) returns (CheckIsPremiumResponse);
-
 }
 
 
