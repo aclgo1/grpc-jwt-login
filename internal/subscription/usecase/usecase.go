@@ -14,14 +14,16 @@ type subscriptionUC struct {
 	BatchSize int64
 	cronTime time.Duration
 	repo subscription.SubscriptionRepository
+	repoRedis subscription.SubscriptionRepositoryRedis
 }
 
 func NewSubscriptionUseCase(ctx context.Context, batchSize int64, cronTime time.Duration,
-	repo subscription.SubscriptionRepository)subscription.SubscriptionUseCase{
+	repo subscription.SubscriptionRepository, repoRedis subscription.SubscriptionRepositoryRedis)subscription.SubscriptionUseCase{
 	s := subscriptionUC{
 		BatchSize: batchSize,
 		cronTime: cronTime,
 		repo: repo,
+		repoRedis: repoRedis,
 	}
 
 	go s.expiredSubscriptionBatch(ctx)
@@ -101,16 +103,34 @@ func(u *subscriptionUC)expiredSubscriptionBatch(ctx context.Context){
 	ticker := time.NewTicker(u.cronTime)
 	defer ticker.Stop()
 
+	lockKey := "lock:expired_subscriptions_job"
+
 	for{
 		select{
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
 
+			lockTtl := u.cronTime -time.Second*3
+			if lockTtl < time.Second*5{
+				lockTtl = time.Second*5
+			}
+
+			acquired, err := u.repoRedis.SetNX(ctx,lockKey, "locked", lockTtl).Result()
+			if err != nil {
+				log.Printf("failed acquired lock redis: %v",err)
+				continue
+			}
+
+			if !acquired{
+				continue
+			}
+
 		Loop:
 			for{
 				select{
 				case <-ctx.Done():
+					u.repoRedis.Del(ctx, lockKey)
 					return
 				default:
 					p := models.SubscriptionExpiredInput{

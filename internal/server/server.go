@@ -49,8 +49,9 @@ func (s *Server) Run() error {
 	usRepoRedis := userRepo.NewredisRepo(s.redisClient)
 	userUC := userUC.NewUserUC(s.logger, usRepo, usRepoRedis, sessUC, s.redisClient)
 	
+	subRepoRedis := subscriptionRepo.NewSubscriptionRedisRepo(s.redisClient)
 	subRepo := subscriptionRepo.NewSubscriptionRepo(s.db)
-	subUC := subscriptionUC.NewSubscriptionUseCase(context.Background(), 500, time.Hour*12, subRepo)
+	subUC := subscriptionUC.NewSubscriptionUseCase(context.Background(), 500, time.Hour*12, subRepo,subRepoRedis)
 
 
 	userService := service.NewUserService(s.logger, userUC)

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/aclgo/grpc-jwt/internal/models"
+	"github.com/redis/go-redis/v9"
 )
 
 
@@ -20,6 +21,11 @@ type SubscriptionRepository interface{
 	CheckPremiun(context.Context, *models.SubscriptionIsPremiunInput)(*models.SubscriptionIsPremiunOutput,error)
 	UpdateSubscriptionsStatusExpired(context.Context,*models.SubscriptionExpiredInput) (*models.SubscriptionExpiredOutput,error)
 	UpdateSubscriptionsStatusCancel(context.Context,*models.SubscriptionCancelInput) (*models.SubscriptionCancelOutput,error)
+}
+
+type SubscriptionRepositoryRedis interface{
+	SetNX(ctx context.Context, key string, value any, expiration time.Duration) *redis.BoolCmd
+	Del(ctx context.Context, keys ...string) *redis.IntCmd
 }
 
 
