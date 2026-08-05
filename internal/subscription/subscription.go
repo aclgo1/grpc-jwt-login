@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/aclgo/grpc-jwt/internal/models"
+	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -26,16 +27,27 @@ type SubscriptionRepository interface{
 type SubscriptionRepositoryRedis interface{
 	SetNX(ctx context.Context, key string, value any, expiration time.Duration) *redis.BoolCmd
 	Del(ctx context.Context, keys ...string) *redis.IntCmd
+	Eval(ctx context.Context, script string, keys []string, args ...interface{}) *redis.Cmd
 }
 
 
 type SubscriptionInput struct {
+	Id string
 	UserId string
 	Plan string
 	Days int64
 }
 
 func(p *SubscriptionInput)Validate()error{
+
+	if p.Id == "" {
+		p.Id = uuid.NewString()
+	}
+
+	_, err := uuid.Parse(p.Id)
+	if err != nil {
+		return err
+	}
 
 	if p.UserId == ""{
 		return errors.New("user id empty")
@@ -53,6 +65,14 @@ func(p *SubscriptionInput)Validate()error{
 	case "1_year":
 		plan = p.Plan
 		days = 365
+	case "undefined":
+		plan = p.Plan
+		if p.Days <= 0 {
+			return errors.New("plan days invalid")
+		}
+
+		days = p.Days
+
 	default:
 		return errors.New("plan subscription invalid")
 	}

@@ -1,14 +1,16 @@
 package service
 
 import (
+	"context"
+
 	"github.com/aclgo/grpc-jwt/internal/subscription"
 	"github.com/aclgo/grpc-jwt/proto"
-	"golang.org/x/net/context"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func(s *subscriptionService) CreateOrExtend(ctx context.Context, req *proto.CreateOrExtendSubscriptionRequest)(*proto.CreateOrExtendSubscriptionResponse,error) {
 	pu := subscription.SubscriptionInput{
+		Id:req.GetId(),
 		UserId: req.GetUserId(),
 		Plan: req.GetPlan(),
 		Days: req.GetDays(),

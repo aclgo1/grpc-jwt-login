@@ -33,10 +33,8 @@ func NewSubscriptionUseCase(ctx context.Context, batchSize int64, cronTime time.
 
 func(u *subscriptionUC)	CreateOrExtend(ctx context.Context, input *subscription.SubscriptionInput)(*subscription.SubscriptionOutput,error){
 
-
-
 	pm := models.SubscriptionInput{
-		Id: uuid.NewString(),
+		Id: input.Id,
 		UserId: input.UserId,
 		Plan: input.Plan,
 		Days: input.Days,
@@ -99,57 +97,68 @@ func(u *subscriptionUC)	CancelSubscription(ctx context.Context, input *subscript
 	return &out,nil
 }
 
-func(u *subscriptionUC)expiredSubscriptionBatch(ctx context.Context){
+const unlockLuaScript = `
+if redis.call("get", KEYS[1]) == ARGV[1] then
+    return redis.call("del", KEYS[1])
+else
+    return 0
+end
+`
+
+func (u *subscriptionUC) expiredSubscriptionBatch(ctx context.Context) {
 	ticker := time.NewTicker(u.cronTime)
 	defer ticker.Stop()
 
 	lockKey := "lock:expired_subscriptions_job"
 
-	for{
-		select{
+	for {
+		select {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
+			u.processExpiredBatchJob(ctx, lockKey)
+		}
+	}
+}
 
-			lockTtl := u.cronTime -time.Second*3
-			if lockTtl < time.Second*5{
-				lockTtl = time.Second*5
+func (u *subscriptionUC) processExpiredBatchJob(ctx context.Context, lockKey string) {
+	lockToken := uuid.NewString()
+
+	lockTtl := max(u.cronTime-30*time.Second, 5*time.Second)
+
+	acquired, err := u.repoRedis.SetNX(ctx, lockKey, lockToken, lockTtl).Result()
+	if err != nil {
+		log.Printf("failed to acquire redis lock: %v", err)
+		return
+	}
+	if !acquired {
+		return 
+	}
+
+	defer func() {
+		u.repoRedis.Eval(context.Background(), unlockLuaScript, []string{lockKey}, lockToken)
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			p := models.SubscriptionExpiredInput{
+				BatchSize: u.BatchSize,
 			}
 
-			acquired, err := u.repoRedis.SetNX(ctx,lockKey, "locked", lockTtl).Result()
+			resp, err := u.repo.UpdateSubscriptionsStatusExpired(ctx, &p)
 			if err != nil {
-				log.Printf("failed acquired lock redis: %v",err)
-				continue
+				log.Printf("failed to update expired subscriptions: %v", err)
+				return
 			}
 
-			if !acquired{
-				continue
+			if resp == nil || resp.RowsAffected < u.BatchSize {
+				return
 			}
 
-		Loop:
-			for{
-				select{
-				case <-ctx.Done():
-					u.repoRedis.Del(ctx, lockKey)
-					return
-				default:
-					p := models.SubscriptionExpiredInput{
-						BatchSize: u.BatchSize,
-					}
-
-					resp,err := u.repo.UpdateSubscriptionsStatusExpired(ctx, &p)
-					if err != nil{
-						log.Printf("failed update subscriptions expired: %v\n",err)
-						break Loop
-					}
-
-					if resp == nil || resp.RowsAffected < u.BatchSize{
-						break Loop
-					}
-
-					time.Sleep(time.Millisecond *100)
-				}
-			}
+			time.Sleep(100 * time.Millisecond)
 		}
 	}
 }
