@@ -32,17 +32,19 @@ func main() {
 		logger.Fatal(err)
 	}
 
-	srcDriver,err := iofs.New(migrations.MigrationsFs, ".")
+	srcDriver, err := iofs.New(migrations.MigrationsFs, ".")
 	if err != nil {
-		log.Fatalf("iofs.New: %v\n",err)
+		log.Fatalf("iofs.New: %v\n", err)
 	}
 
-	dbDriver, err := postgres.WithInstance(db.DB, &postgres.Config{})
-	if err != nil{
-		log.Fatalf("postgres.NewIstance: %v\n",err)
+	dbDriver, err := postgres.WithInstance(db.DB, &postgres.Config{
+		MigrationsTable: "schema_migrations_users",
+	})
+	if err != nil {
+		log.Fatalf("postgres.NewIstance: %v\n", err)
 	}
 
-	m,err := migrate.NewWithInstance(
+	m, err := migrate.NewWithInstance(
 		"iofs",
 		srcDriver,
 		"postgres",
@@ -50,13 +52,12 @@ func main() {
 	)
 
 	if err != nil {
-		log.Fatalf("migrate.NewInstance: %v\n",err)
+		log.Fatalf("migrate.NewInstance: %v\n", err)
 	}
 
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange{
-		log.Fatalf("up migrate: %v\n",err)
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatalf("up migrate: %v\n", err)
 	}
-
 
 	redisClient := rredis.NewRedisClient(cfg)
 
