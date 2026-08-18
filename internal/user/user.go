@@ -32,6 +32,7 @@ type UserUC interface {
 	Update(context.Context, *ParamsUpdateUser) (*ParamsOutputUser, error)
 	Delete(context.Context, *ParamsDeleteUser) error
 	Login(context.Context, string, string) (*models.Tokens, error)
+	LoginNoPass(context.Context, string) (*models.Tokens, error)
 	Logout(context.Context, *ParamLogoutInput) error
 	ValidToken(context.Context, *ParamsValidToken) (*ParamsJwtData, error)
 	RefreshTokens(context.Context, *ParamsRefreshTokens) (*RefreshTokens, error)

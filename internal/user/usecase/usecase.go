@@ -109,7 +109,43 @@ func (u *userUC) Login(ctx context.Context, email string, password string) (*mod
 		Access:  tokens.Access,
 		Refresh: tokens.Refresh,
 	}, nil
+}
 
+func (u *userUC) LoginNoPass(ctx context.Context, email string) (*models.Tokens, error) {
+
+	foundUser, err := u.userRepoDatabase.FindByEmail(ctx, email)
+	if err != nil {
+		u.logger.Errorf("Login.FindByEmail: %v", err)
+		return nil, fmt.Errorf("Login.FindByEmail: %v", err)
+	}
+
+	if foundUser.Verified == user.DefaultVerifiedNo {
+		return nil, user.ErrUserNotVerified{}
+	}
+
+	tokens, err := u.jwtSession.CreateTokens(ctx, foundUser.UserID, foundUser.Role)
+	if err != nil {
+		u.logger.Errorf("Login.CreateTokens: %v", err)
+		return nil, fmt.Errorf("Login.CreateTokens: %v", err)
+	}
+
+	pipe := u.rc.Pipeline()
+
+	pipe.Set(ctx, user.FormatActiveSessionAccess(foundUser.UserID), tokens.Access, session.TtlExpAccessTTK)
+	pipe.Set(ctx, user.FormatActiveSessionRefresh(foundUser.UserID), tokens.Refresh, session.TtlExpRefreshTTK)
+	_, err = pipe.Exec(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("pipe.Exec: %w", err)
+	}
+
+	u.rc.Publish(ctx, "disconnect_channel", user.FormatTokenDisconnectChannel(foundUser.UserID))
+
+	u.logger.Infof("Login: usuário %s autenticado com sucesso", email)
+
+	return &models.Tokens{
+		Access:  tokens.Access,
+		Refresh: tokens.Refresh,
+	}, nil
 }
 
 func (u *userUC) Logout(ctx context.Context, in *user.ParamLogoutInput) error {

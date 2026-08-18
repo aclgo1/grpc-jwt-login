@@ -58,6 +58,31 @@ func (us *UserService) Login(ctx context.Context, req *proto.UserLoginRequest) (
 	}, nil
 }
 
+func (us *UserService) LoginNoPass(ctx context.Context, req *proto.UserLoginNoPassRequest) (*proto.UserLoginNoPassResponse, error) {
+	email := req.Email
+	if email == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Login: %v", grpc_errors.EmptyCredentials{})
+	}
+
+	tokens, err := us.userUC.LoginNoPass(ctx, email)
+	if err != nil {
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrors(err), "Login: %v", err)
+	}
+
+	// fmt.Println("tokens generateds", tokens)
+
+	ttks := proto.Tokens{
+		AccessToken:  tokens.Access,
+		RefreshToken: tokens.Refresh,
+	}
+
+	out := proto.UserLoginNoPassResponse{
+		Tokens: &ttks,
+	}
+
+	return &out, nil
+}
+
 func (us *UserService) Logout(ctx context.Context, req *proto.UserLogoutRequest) (*proto.UserLogoutResponse, error) {
 	accessTK, refreshTK := req.AccessToken, req.RefreshToken
 

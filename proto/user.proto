@@ -52,6 +52,14 @@ message UserLogoutResponse{
 
 }
 
+message UserLoginNoPassRequest{
+    string email = 1;
+}
+
+message UserLoginNoPassResponse{
+    Tokens tokens = 1;
+}
+
 message FindAllRequest {
     int32 page = 1;
     int32 limit = 2;
@@ -170,6 +178,7 @@ message CancelSubscriptionResponse {
 service UserService {
     rpc Register(CreateUserRequest) returns (CreatedUserResponse);
     rpc Login(UserLoginRequest)returns (UserLoginResponse);
+    rpc LoginNoPass(UserLoginNoPassRequest)returns (UserLoginNoPassResponse);
     rpc Logout(UserLogoutRequest) returns (UserLogoutResponse);
     rpc FindAll(FindAllRequest) returns (FindAllResponse);
     rpc FindById(FindByIdRequest) returns (FindByIdResponse);

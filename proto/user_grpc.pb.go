@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	UserService_Register_FullMethodName      = "/UserService/Register"
 	UserService_Login_FullMethodName         = "/UserService/Login"
+	UserService_LoginNoPass_FullMethodName   = "/UserService/LoginNoPass"
 	UserService_Logout_FullMethodName        = "/UserService/Logout"
 	UserService_FindAll_FullMethodName       = "/UserService/FindAll"
 	UserService_FindById_FullMethodName      = "/UserService/FindById"
@@ -38,6 +39,7 @@ const (
 type UserServiceClient interface {
 	Register(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreatedUserResponse, error)
 	Login(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*UserLoginResponse, error)
+	LoginNoPass(ctx context.Context, in *UserLoginNoPassRequest, opts ...grpc.CallOption) (*UserLoginNoPassResponse, error)
 	Logout(ctx context.Context, in *UserLogoutRequest, opts ...grpc.CallOption) (*UserLogoutResponse, error)
 	FindAll(ctx context.Context, in *FindAllRequest, opts ...grpc.CallOption) (*FindAllResponse, error)
 	FindById(ctx context.Context, in *FindByIdRequest, opts ...grpc.CallOption) (*FindByIdResponse, error)
@@ -71,6 +73,16 @@ func (c *userServiceClient) Login(ctx context.Context, in *UserLoginRequest, opt
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserLoginResponse)
 	err := c.cc.Invoke(ctx, UserService_Login_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) LoginNoPass(ctx context.Context, in *UserLoginNoPassRequest, opts ...grpc.CallOption) (*UserLoginNoPassResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserLoginNoPassResponse)
+	err := c.cc.Invoke(ctx, UserService_LoginNoPass_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -173,6 +185,7 @@ func (c *userServiceClient) GetStatsConns(ctx context.Context, in *GetStatsConns
 type UserServiceServer interface {
 	Register(context.Context, *CreateUserRequest) (*CreatedUserResponse, error)
 	Login(context.Context, *UserLoginRequest) (*UserLoginResponse, error)
+	LoginNoPass(context.Context, *UserLoginNoPassRequest) (*UserLoginNoPassResponse, error)
 	Logout(context.Context, *UserLogoutRequest) (*UserLogoutResponse, error)
 	FindAll(context.Context, *FindAllRequest) (*FindAllResponse, error)
 	FindById(context.Context, *FindByIdRequest) (*FindByIdResponse, error)
@@ -197,6 +210,9 @@ func (UnimplementedUserServiceServer) Register(context.Context, *CreateUserReque
 }
 func (UnimplementedUserServiceServer) Login(context.Context, *UserLoginRequest) (*UserLoginResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedUserServiceServer) LoginNoPass(context.Context, *UserLoginNoPassRequest) (*UserLoginNoPassResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method LoginNoPass not implemented")
 }
 func (UnimplementedUserServiceServer) Logout(context.Context, *UserLogoutRequest) (*UserLogoutResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Logout not implemented")
@@ -278,6 +294,24 @@ func _UserService_Login_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).Login(ctx, req.(*UserLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_LoginNoPass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserLoginNoPassRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).LoginNoPass(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_LoginNoPass_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).LoginNoPass(ctx, req.(*UserLoginNoPassRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -458,6 +492,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _UserService_Login_Handler,
+		},
+		{
+			MethodName: "LoginNoPass",
+			Handler:    _UserService_LoginNoPass_Handler,
 		},
 		{
 			MethodName: "Logout",
